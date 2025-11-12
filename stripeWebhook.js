@@ -33,7 +33,8 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   await updateCampaign(invoice.amount_paid);
 
   res.status(200).json({ received: true });
-}
-);
+} // 
+
+
 
 module.exports = router;

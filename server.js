@@ -1,38 +1,17 @@
-require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const handleStripeEvent = require('./stripeWebhook');
-
 const app = express();
-app.use(bodyParser.raw({ type: 'application/json' }));
 
-app.post('/webhook', async (req, res) => {
-  const sig = req.headers['stripe-signature'];
+// Apply express.json() globally for all other routes
+app.use(express.json());
 
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    console.error('❌ Webhook error:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+// Mount /webhook route with raw body parser
+const stripeWebhook = require('./stripeWebhook');
+app.use('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 
-  try {
-    console.log('✅ Webhook received:', event.type);
-    await handleStripeEvent(event);
-    res.status(200).end();
-  } catch (err) {
-    console.error('❌ Error handling event:', err.message);
-    res.status(500).end();
-  }
-});
+// Example: Mount other routes if you have them
+// app.use('/sms', require('./sendSms'));
 
-const PORT = 4242;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Webhook server running on http://localhost:${PORT}`);
+  console.log(`✅ Server listening on port ${PORT}`);
 });

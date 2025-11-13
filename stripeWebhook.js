@@ -1,17 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Stripe = require('stripe');
-const getRawBody = require('raw-body');
 
-// Make sure this key matches your environment variable name
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
-
-// Endpoint Secret (from Stripe webhook settings — same page where you got your webhook URL)
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+router.post('/', async (req, res) => {
   const sig = req.headers['stripe-signature'];
-
   let event;
 
   try {
@@ -25,7 +20,6 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;
 
-    // Print to logs (for now)
     console.log('✅ Payment succeeded for customer:', invoice.customer);
     console.log('💵 Amount paid:', invoice.amount_paid);
 
@@ -33,8 +27,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
     await updateCampaign(invoice.amount_paid);
   }
 
-  // Always respond to Stripe
   res.status(200).json({ received: true });
-}); // <-- this was missing
+});
 
 module.exports = router;

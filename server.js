@@ -1,14 +1,14 @@
 const express = require('express');
 const app = express();
 
-// Apply express.json() globally for all other routes
-
-
-// Mount /webhook route with raw body parser
+// Mount /webhook route with raw body parser BEFORE json()
 const stripeWebhook = require('./stripeWebhook');
 app.use('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
+
+// Apply express.json() globally AFTER webhook
 app.use(express.json());
-// Example: Mount other routes if you have them
+
+// Example: Mount other routes
 // app.use('/sms', require('./sendSms'));
 
 const PORT = process.env.PORT || 3000;

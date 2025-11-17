@@ -27,5 +27,35 @@ async function updateCampaign(amount) {
 }
 
 module.exports = updateCampaign;
+// ⭐ SCOOPS & SUBS — Permanent weekly update logic ⭐
+async function handleScoopsAndSubsPayment() {
+    const adset1 = process.env.FB_ADSET_1_ID;
+    const adset2 = process.env.FB_ADSET_2_ID;
+
+    const weeklyIncrease = 66.25; 
+    const daysToExtend = 7;
+
+    console.log("➡️ Starting Scoops & Subs update...");
+
+    try {
+        // Increase budgets
+        await updateAdSetBudget(adset1, weeklyIncrease);
+        await updateAdSetBudget(adset2, weeklyIncrease);
+        console.log("✔️ Budgets increased by +$66.25 for each ad set");
+
+        // Extend end dates
+        await extendAdSetEndDate(adset1, daysToExtend);
+        await extendAdSetEndDate(adset2, daysToExtend);
+        console.log("✔️ End dates extended by +7 days for each ad set");
+
+        console.log("🎯 Scoops & Subs update completed.");
+    } catch (err) {
+        console.error("❌ Error updating Scoops & Subs:", err.message);
+        throw err;
+    }
+}
+
+// Export the function so stripeWebhook.js can use it
+module.exports.handleScoopsAndSubsPayment = handleScoopsAndSubsPayment;
 
 

@@ -27,6 +27,62 @@ async function updateCampaign(amount) {
 }
 
 module.exports = updateCampaign;
+// ⭐ Update Ad Set Budget
+async function updateAdSetBudget(adsetId, increaseAmount) {
+
+    const url = `https://graph.facebook.com/v19.0/${adsetId}`;
+    const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
+
+    try {
+        console.log(`➡️ Updating ad set ${adsetId} budget by $${increaseAmount}`);
+
+        const response = await axios({
+            method: 'POST',
+            url: url,
+            params: {
+                access_token: accessToken,
+                lifetime_budget: Math.round(increaseAmount * 100)  // Facebook expects cents
+            }
+        });
+
+        console.log(`✔️ Budget updated for ad set ${adsetId}:`, response.data);
+
+    } catch (err) {
+        console.error(`❌ Error updating budget for ad set ${adsetId}:`, err.response?.data || err.message);
+        throw err;
+    }
+}
+
+// ⭐ Extend Ad Set End Date
+async function extendAdSetEndDate(adsetId, daysToAdd) {
+
+    const url = `https://graph.facebook.com/v19.0/${adsetId}`;
+    const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
+
+    const currentEndTime = Math.floor(Date.now() / 1000);
+    const newEndTime = currentEndTime + (daysToAdd * 24 * 60 * 60);
+
+    try {
+        console.log(`➡️ Extending end date for ad set ${adsetId} by ${daysToAdd} days`);
+
+        const response = await axios({
+            method: 'POST',
+            url: url,
+            params: {
+                access_token: accessToken,
+                end_time: newEndTime
+            }
+        });
+
+        console.log(`✔️ End date updated for ad set ${adsetId}:`, response.data);
+
+    } catch (err) {
+        console.error(`❌ Error extending end date for ad set ${adsetId}:`, err.response?.data || err.message);
+        throw err;
+    }
+}
+
+
 // ⭐ SCOOPS & SUBS — Permanent weekly update logic ⭐
 async function handleScoopsAndSubsPayment() {
     const adset1 = process.env.FB_ADSET_1_ID;
@@ -57,5 +113,7 @@ async function handleScoopsAndSubsPayment() {
 
 // Export the function so stripeWebhook.js can use it
 module.exports.handleScoopsAndSubsPayment = handleScoopsAndSubsPayment;
+module.exports.updateAdSetBudget = updateAdSetBudget;
+module.exports.extendAdSetEndDate = extendAdSetEndDate;
 
 

@@ -16,7 +16,24 @@ router.post('/', async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // ✅ Stripe event verified — now handle it
+  // ✅ Stripe event verified — now handle it // ⭐ SCOOPS & SUBS — Detect this client's payments ⭐
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    // Replace this with Arah Williams' actual Stripe customer ID
+    const SCOOPS_CUSTOMER_ID = "cus_StFbuW9XQ1IERH";
+
+    if (invoice.customer === SCOOPS_CUSTOMER_ID) {
+        console.log("➡️ Scoops & Subs payment detected!");
+
+        // Load the handler function
+        const { handleScoopsAndSubsPayment } = require('./facebookApi');
+
+        await handleScoopsAndSubsPayment();
+        return res.status(200).json({ received: true });
+    }
+}
+
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;
 

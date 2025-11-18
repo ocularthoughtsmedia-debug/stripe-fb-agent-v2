@@ -16,7 +16,24 @@ router.post('/', async (req, res) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // ✅ Stripe event verified — now handle it // ⭐ SCOOPS & SUBS — Detect this client's payments ⭐
+  // ✅ Stripe event verified — now handle it // ⭐ SCOOPS & SUBS — Detect this client's payments ⭐// ⭐ CLIENT: Automatic Weekly Update (Campaign Budget + End Dates)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    // This client's Stripe customer ID
+    const CLIENT_TWO_ID = "cus_SDerLwePwWxkc5";
+
+    if (invoice.customer === CLIENT_TWO_ID) {
+        console.log("➡️ Client Two payment detected!");
+
+        // Load the handler function
+        const { handleClientTwoWeeklyUpdate } = require('./facebookApi');
+
+        await handleClientTwoWeeklyUpdate();
+        return res.status(200).json({ received: true });
+    }
+}
+
 if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;
 

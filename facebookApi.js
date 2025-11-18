@@ -82,6 +82,32 @@ async function extendAdSetEndDate(adsetId, daysToAdd) {
     }
 }
 
+// ⭐ Update Campaign Budget (Lifetime Budget Addition)
+async function updateCampaignBudget(campaignId, increaseAmount) {
+    const url = `https://graph.facebook.com/v19.0/${campaignId}`;
+    const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
+
+    try {
+        console.log(`➡️ Updating campaign ${campaignId} budget by $${increaseAmount}`);
+
+        const response = await axios({
+            method: 'POST',
+            url: url,
+            params: {
+                access_token: accessToken,
+                lifetime_budget: Math.round(increaseAmount * 100)
+            }
+        });
+
+        console.log(`✔️ Campaign budget updated:`, response.data);
+
+    } catch (err) {
+        console.error(`❌ Error updating campaign budget:`, err.response?.data || err.message);
+        throw err;
+    }
+
+
+module.exports.updateCampaignBudget = updateCampaignBudget;
 
 // ⭐ SCOOPS & SUBS — Permanent weekly update logic ⭐
 async function handleScoopsAndSubsPayment() {
@@ -115,5 +141,42 @@ async function handleScoopsAndSubsPayment() {
 module.exports.handleScoopsAndSubsPayment = handleScoopsAndSubsPayment;
 module.exports.updateAdSetBudget = updateAdSetBudget;
 module.exports.extendAdSetEndDate = extendAdSetEndDate;
+// ⭐ CLIENT TWO — Weekly Update Logic (Campaign Budget + Adset End Dates)
+async function handleClientTwoWeeklyUpdate() {
+
+    // ENV is not needed for this one; we use static IDs you provided
+    const campaignId = "120217539262580513";
+
+    const adset1 = "120217539262570513";
+    const adset2 = "120228751295640513";
+
+    const weeklyIncrease = 66.25;  // dollars
+    const daysToExtend = 7;
+
+    console.log("➡️ Starting Client Two weekly update...");
+
+    try {
+        // Increase campaign budget
+        await updateCampaignBudget(campaignId, weeklyIncrease);
+        console.log("✔️ Campaign budget increased by +$66.25");
+
+        // Extend adset #1
+        await extendAdSetEndDate(adset1, daysToExtend);
+        console.log("✔️ Ad Set 1 extended +7 days");
+
+        // Extend adset #2
+        await extendAdSetEndDate(adset2, daysToExtend);
+        console.log("✔️ Ad Set 2 extended +7 days");
+
+        console.log("🎯 Client Two weekly update completed.");
+    } catch (err) {
+        console.error("❌ Error in Client Two update:", err.message);
+        throw err;
+    }
+}
+
+// Export it
+module.exports.handleClientTwoWeeklyUpdate = handleClientTwoWeeklyUpdate;}
+
 
 

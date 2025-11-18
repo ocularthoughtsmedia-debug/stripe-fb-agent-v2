@@ -105,7 +105,7 @@ async function updateCampaignBudget(campaignId, increaseAmount) {
         console.error(`❌ Error updating campaign budget:`, err.response?.data || err.message);
         throw err;
     }
-
+}
 
 module.exports.updateCampaignBudget = updateCampaignBudget;
 
@@ -179,6 +179,6 @@ module.exports = {
     handleClientTwoWeeklyUpdate,
     updateAdSetBudget,
     extendAdSetEndDate
-};}
+};
 
 

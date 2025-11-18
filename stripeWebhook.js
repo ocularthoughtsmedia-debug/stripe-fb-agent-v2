@@ -50,6 +50,21 @@ if (event.type === 'invoice.payment_succeeded') {
         return res.status(200).json({ received: true });
     }
 }
+// ⭐ CLIENT 3 — Spill The Beans (Robbie Wilkerson)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const SPILL_CUSTOMER_ID = "cus_TEyLO2B2ut8Mcx";
+
+    if (invoice.customer === SPILL_CUSTOMER_ID) {
+        console.log("☕ Spill The Beans payment detected!");
+
+        const { handleSpillTheBeansUpdate } = require('./facebookApi');
+        await handleSpillTheBeansUpdate();
+
+        return res.status(200).json({ received: true });
+    }
+}
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;

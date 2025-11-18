@@ -193,6 +193,32 @@ async function handleClientTwoWeeklyUpdate() {
         throw err;
     }
 }
+// ⭐ CLIENT 3 — Spill The Beans Update (AdSet Budgets + End Date)
+async function handleSpillTheBeansUpdate() {
+
+    const adset1 = "120230160869600513";   // Spill The Beans ad set ID
+    const weeklyIncrease = 66.25;
+    const daysToExtend = 7;
+
+    console.log("☕ Starting Spill The Beans weekly update...");
+
+    try {
+        // Increase ad set budget
+        await updateAdSetBudget(adset1, weeklyIncrease);
+        console.log(`☕ AdSet budget increased by +$${weeklyIncrease}`);
+
+        // Add 7 days to end date
+        await extendAdSetEndDate(adset1, daysToExtend);
+        console.log(`☕ AdSet extended +${daysToExtend} days`);
+
+        console.log("☕ Spill The Beans weekly update completed.");
+    } catch (err) {
+        console.error("❌ Error in Spill The Beans update:", err.message);
+        throw err;
+    }
+}
+
+module.exports.handleSpillTheBeansUpdate = handleSpillTheBeansUpdate;
 
 // Export it
 module.exports = {

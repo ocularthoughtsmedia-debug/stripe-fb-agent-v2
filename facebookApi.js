@@ -84,28 +84,50 @@ async function extendAdSetEndDate(adsetId, daysToAdd) {
 
 // ⭐ Update Campaign Budget (Lifetime Budget Addition)
 async function updateCampaignBudget(campaignId, increaseAmount) {
-    const url = `https://graph.facebook.com/v19.0/${campaignId}`;
     const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
 
     try {
-        console.log(`➡️ Updating campaign ${campaignId} budget by $${increaseAmount}`);
+        console.log(`🔍 Fetching current budget for campaign ${campaignId}...`);
 
-        const response = await axios({
-            method: 'POST',
-            url: url,
+        // STEP 1 — Get existing budget
+        const getResponse = await axios({
+            method: 'GET',
+            url: `https://graph.facebook.com/v19.0/${campaignId}`,
             params: {
                 access_token: accessToken,
-                lifetime_budget: Math.round(increaseAmount * 100)
+                fields: 'lifetime_budget'
             }
         });
 
-        console.log(`✔️ Campaign budget updated:`, response.data);
+        const currentBudgetCents = getResponse.data.lifetime_budget;
+        const currentBudget = currentBudgetCents / 100;
+
+        console.log(`💰 Current campaign budget: $${currentBudget}`);
+
+        // STEP 2 — Add increaseAmount
+        const newBudget = currentBudget + increaseAmount;
+        const newBudgetCents = Math.round(newBudget * 100);
+
+        console.log(`⬆️ New campaign budget will be: $${newBudget}`);
+
+        // STEP 3 — Update the campaign budget
+        const updateResponse = await axios({
+            method: 'POST',
+            url: `https://graph.facebook.com/v19.0/${campaignId}`,
+            params: {
+                access_token: accessToken,
+                lifetime_budget: newBudgetCents
+            }
+        });
+
+        console.log(`✅ Campaign budget updated to $${newBudget}`, updateResponse.data);
 
     } catch (err) {
         console.error(`❌ Error updating campaign budget:`, err.response?.data || err.message);
         throw err;
     }
 }
+
 
 module.exports.updateCampaignBudget = updateCampaignBudget;
 

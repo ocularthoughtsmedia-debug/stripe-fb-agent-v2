@@ -176,7 +176,12 @@ async function handleClientTwoWeeklyUpdate() {
 }
 
 // Export it
-module.exports.handleClientTwoWeeklyUpdate = handleClientTwoWeeklyUpdate;}
-
+module.exports = {
+    updateCampaignBudget,
+    handleScoopsAndSubsPayment,
+    handleClientTwoWeeklyUpdate,
+    updateAdSetBudget,
+    extendAdSetEndDate
+};}
 
 

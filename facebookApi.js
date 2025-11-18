@@ -137,10 +137,7 @@ async function handleScoopsAndSubsPayment() {
     }
 }
 
-// Export the function so stripeWebhook.js can use it
-module.exports.handleScoopsAndSubsPayment = handleScoopsAndSubsPayment;
-module.exports.updateAdSetBudget = updateAdSetBudget;
-module.exports.extendAdSetEndDate = extendAdSetEndDate;
+
 // ⭐ CLIENT TWO — Weekly Update Logic (Campaign Budget + Adset End Dates)
 async function handleClientTwoWeeklyUpdate() {
 

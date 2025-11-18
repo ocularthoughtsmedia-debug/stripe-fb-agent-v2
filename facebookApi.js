@@ -217,16 +217,46 @@ async function handleSpillTheBeansUpdate() {
         throw err;
     }
 }
+// ⭐ CLIENT 4 – Salt & KO Weekly Update (AdSet Budgets + End Dates)
+async function handleSaltAndKoUpdate() {
 
-module.exports.handleSpillTheBeansUpdate = handleSpillTheBeansUpdate;
+    const adset1 = "120226475065410513";   // Salt & KO Ad Set 1 ID
+    const adset2 = "120232314137180513";   // Salt & KO Ad Set 2 ID
+    const weeklyIncrease = 66.25;
+    const daysToExtend = 7;
+
+    console.log("🧂 Starting Salt & KO weekly update...");
+
+    try {
+
+        // Increase both ad set budgets
+        await updateAdSetBudget(adset1, weeklyIncrease);
+        await updateAdSetBudget(adset2, weeklyIncrease);
+        console.log(`✔️ Budgets increased by +$${weeklyIncrease} for both ad sets`);
+
+        // Extend both ad sets by 7 days
+        await extendAdSetEndDate(adset1, daysToExtend);
+        await extendAdSetEndDate(adset2, daysToExtend);
+        console.log(`✔️ Ad Sets extended +${daysToExtend} days each`);
+
+        console.log("🎉 Salt & KO weekly update completed.");
+
+    } catch (err) {
+        console.error("❌ Error in Salt & KO update:", err.message);
+        throw err;
+    }
+}
 
 // Export it
 module.exports = {
     updateCampaignBudget,
     handleScoopsAndSubsPayment,
     handleClientTwoWeeklyUpdate,
+    handleSpillTheBeansUpdate,
+    handleSaltAndKoUpdate,
     updateAdSetBudget,
     extendAdSetEndDate
 };
+
 
 

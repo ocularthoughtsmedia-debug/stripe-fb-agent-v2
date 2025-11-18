@@ -65,6 +65,21 @@ if (event.type === 'invoice.payment_succeeded') {
         return res.status(200).json({ received: true });
     }
 }
+// ⭐ CLIENT 4 – Salt & KO (Ryan Salter)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const SALT_KO_CUSTOMER_ID = "cus_SyBU8uZluGlMnx";
+
+    if (invoice.customer === SALT_KO_CUSTOMER_ID) {
+        console.log("🧂 Salt & KO payment detected!");
+
+        const { handleSaltAndKoUpdate } = require('./facebookApi');
+        await handleSaltAndKoUpdate();
+
+        return res.status(200).json({ received: true });
+    }
+}
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;

@@ -246,6 +246,37 @@ async function handleSaltAndKoUpdate() {
         throw err;
     }
 }
+// ⭐ CLIENT 5 – Big Zaddy’s Burgers Weekly Update (AdSet Budgets + End Dates)
+async function handleBigZaddysUpdate() {
+
+    const adset1 = "120230224956520513";
+    const adset2 = "120230224956530513";
+    const adset3 = "120233905457990513";
+
+    const weeklyIncrease = 66.25;
+    const daysToExtend = 7;
+
+    console.log("🍔 Starting Big Zaddy’s weekly update...");
+
+    try {
+        // Increase budgets for all 3 ad sets
+        await updateAdSetBudget(adset1, weeklyIncrease);
+        await updateAdSetBudget(adset2, weeklyIncrease);
+        await updateAdSetBudget(adset3, weeklyIncrease);
+        console.log(`💵 Budgets increased by +$${weeklyIncrease} for all 3 ad sets`);
+
+        // Extend all 3 ad sets by 7 days
+        await extendAdSetEndDate(adset1, daysToExtend);
+        await extendAdSetEndDate(adset2, daysToExtend);
+        await extendAdSetEndDate(adset3, daysToExtend);
+        console.log(`📅 All 3 ad sets extended +${daysToExtend} days`);
+
+        console.log("🍔 Big Zaddy’s weekly update completed.");
+    } catch (err) {
+        console.error("❌ Error in Big Zaddy’s update:", err.message);
+        throw err;
+    }
+}
 
 // Export it
 module.exports = {
@@ -254,6 +285,7 @@ module.exports = {
     handleClientTwoWeeklyUpdate,
     handleSpillTheBeansUpdate,
     handleSaltAndKoUpdate,
+    handleBigZaddysUpdate,
     updateAdSetBudget,
     extendAdSetEndDate
 };

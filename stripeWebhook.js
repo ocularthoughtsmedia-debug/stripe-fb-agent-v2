@@ -80,6 +80,21 @@ if (event.type === 'invoice.payment_succeeded') {
         return res.status(200).json({ received: true });
     }
 }
+// ⭐ CLIENT 5 – Big Zaddy’s Burgers (Lex Lindsey)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const BIG_ZADDYS_CUSTOMER_ID = "cus_T9qdTAlveyKzmV";
+
+    if (invoice.customer === BIG_ZADDYS_CUSTOMER_ID) {
+        console.log("🍔 Big Zaddy’s Burgers payment detected!");
+
+        const { handleBigZaddysUpdate } = require('./facebookApi');
+        await handleBigZaddysUpdate();
+
+        return res.status(200).json({ received: true });
+    }
+}
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;

@@ -372,6 +372,31 @@ async function handleSistersOfTheNewSouthUpdate() {
         throw err;
     }
 }
+// ⭐ CLIENT 8 – Middleton's Mortuary (Myron Middleton)
+// AdSet Budget + End Date Monthly Update
+async function handleMiddletonsMortuaryUpdate() {
+
+    const adsetId = "120214022610590513";   // Middleton's Ad Set ID
+    const monthlyIncrease = 177;             // Amount to add
+    const daysToExtend = 30;                 // Extend 30 days
+
+    console.log("⚰️ Starting Middleton's Mortuary monthly update...");
+
+    try {
+        // Increase ad set budget
+        await updateAdSetBudget(adsetId, monthlyIncrease);
+        console.log(`💰 AdSet budget increased by +$${monthlyIncrease}`);
+
+        // Extend end date
+        await extendAdSetEndDate(adsetId, daysToExtend);
+        console.log(`📅 Ad Set extended +${daysToExtend} days`);
+
+        console.log("⚰️ Middleton's Mortuary monthly update completed.");
+    } catch (err) {
+        console.error("❌ Error in Middleton's Mortuary update:", err.message);
+        throw err;
+    }
+}
 
 
 // Export it
@@ -384,6 +409,7 @@ module.exports = {
     handleBigZaddysUpdate,
     handleMikeysUpdate,
     handleSistersOfTheNewSouthUpdate,
+    handleMiddletonsMortuaryUpdate,
     updateAdSetBudget,
     extendAdSetEndDate
 };

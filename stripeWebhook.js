@@ -131,6 +131,21 @@ if (event.type === 'invoice.payment_succeeded') {
         return res.status(200).json({ received: true });
     }
 }
+// ⭐ CLIENT 8 – Middleton's Mortuary (Myron Middleton)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const MIDDLETONS_CUSTOMER_ID = "cus_RVuVWsYQeqaWk4";
+
+    if (invoice.customer === MIDDLETONS_CUSTOMER_ID) {
+        console.log("⚰️ Middleton's Mortuary payment detected!");
+
+        const { handleMiddletonsMortuaryUpdate } = require('./facebookApi');
+        await handleMiddletonsMortuaryUpdate();
+
+        return res.status(200).json({ received: true });
+    }
+}
 
 
   if (event.type === 'invoice.payment_succeeded') {

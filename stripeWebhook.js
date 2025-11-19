@@ -117,24 +117,29 @@ if (event.type === 'invoice.payment_succeeded') {
     const SISTERS_CUSTOMER_ID = "cus_RqnzWFn5JhZNOP";
 
     if (invoice.customer === SISTERS_CUSTOMER_ID) {
-        console.log("🍗 Sisters of the New South payment detected!");
+        console.log("🍽️ Sisters of the New South payment detected!");
 
-        const { handleSistersOfTheNewSouthUpdate } = require('./facebookApi');
-        await handleSistersOfTheNewSouthUpdate();
+        const {
+            handleSistersCampaignAUpdate,
+            handleSistersCampaignBUpdate
+        } = require('./facebookApi');
+
+        // Run BOTH campaigns
+        await handleSistersCampaignAUpdate();
+        await handleSistersCampaignBUpdate();
 
         return res.status(200).json({ received: true });
     }
 }
 
+
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;
 
-    console.log('✅ Payment succeeded for customer:', invoice.customer);
-    console.log('💵 Amount paid:', invoice.amount_paid);
+    console.log("⚠️ No matching client handler for:", invoice.customer);
+    console.log("Payment amount:", invoice.amount_paid);
+}
 
-    const updateCampaign = require('./facebookApi');
-    await updateCampaign(invoice.amount_paid);
-  }
 
   res.status(200).json({ received: true });
 });

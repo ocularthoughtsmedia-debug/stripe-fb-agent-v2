@@ -95,6 +95,21 @@ if (event.type === 'invoice.payment_succeeded') {
         return res.status(200).json({ received: true });
     }
 }
+// ⭐ CLIENT 6 – Mikey's Drive Thru (Nel Ancrum)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const MIKEYS_CUSTOMER_ID = "cus_T4otdg14dN1oVK";
+
+    if (invoice.customer === MIKEYS_CUSTOMER_ID) {
+        console.log("🍔 Mikey's Drive Thru payment detected!");
+
+        const { handleMikeysUpdate } = require('./facebookApi');
+        await handleMikeysUpdate();
+
+        return res.status(200).json({ received: true });
+    }
+}
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;

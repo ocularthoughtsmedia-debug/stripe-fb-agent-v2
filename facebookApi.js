@@ -277,6 +277,34 @@ async function handleBigZaddysUpdate() {
         throw err;
     }
 }
+// ⭐ CLIENT 6 – Mikey's Drive Thru Weekly Update (AdSet Budgets + End Dates)
+async function handleMikeysUpdate() {
+
+    const adset1 = "120229009215660513";  // Mikey's Ad Set 1 ID
+    const adset2 = "120232388733760513";  // Mikey's Ad Set 2 ID
+    const weeklyIncrease = 66.25;
+    const daysToExtend = 7;
+
+    console.log("🍔 Starting Mikey's Drive Thru weekly update...");
+
+    try {
+        // Increase ad set budgets
+        await updateAdSetBudget(adset1, weeklyIncrease);
+        await updateAdSetBudget(adset2, weeklyIncrease);
+        console.log(`💸 Budgets increased by +$${weeklyIncrease} for both ad sets`);
+
+        // Extend end dates
+        await extendAdSetEndDate(adset1, daysToExtend);
+        await extendAdSetEndDate(adset2, daysToExtend);
+        console.log(`⏳ Ad Sets extended +${daysToExtend} days each`);
+
+        console.log("✅ Mikey's Drive Thru weekly update completed.");
+    } catch (err) {
+        console.error("❌ Error in Mikey's Drive Thru update:", err.message);
+        throw err;
+    }
+}
+
 
 // Export it
 module.exports = {
@@ -286,9 +314,11 @@ module.exports = {
     handleSpillTheBeansUpdate,
     handleSaltAndKoUpdate,
     handleBigZaddysUpdate,
+    handleMikeysUpdate,
     updateAdSetBudget,
     extendAdSetEndDate
 };
+
 
 
 

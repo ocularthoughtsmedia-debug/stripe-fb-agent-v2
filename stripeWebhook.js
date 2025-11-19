@@ -146,6 +146,21 @@ if (event.type === 'invoice.payment_succeeded') {
         return res.status(200).json({ received: true });
     }
 }
+// ⭐ CLIENT 9 – The Q Spot (Rasheda Brown)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const QSPOT_CUSTOMER_ID = "cus_TOAHOHfXHuTdKU";
+
+    if (invoice.customer === QSPOT_CUSTOMER_ID) {
+        console.log("🍽️ Q Spot payment detected!");
+
+        const { handleQSpotUpdate } = require('./facebookApi');
+        await handleQSpotUpdate();
+
+        return res.status(200).json({ received: true });
+    }
+}
 
 
   if (event.type === 'invoice.payment_succeeded') {

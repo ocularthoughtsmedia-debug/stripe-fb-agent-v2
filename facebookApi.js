@@ -397,6 +397,32 @@ async function handleMiddletonsMortuaryUpdate() {
         throw err;
     }
 }
+// ⭐ CLIENT 9 – The Q Spot (Rasheda Brown)
+// Campaign Budget + AdSet End Date Monthly Update
+async function handleQSpotUpdate() {
+
+    const campaignId = "120207128523590513";    // Q Spot Campaign ID
+    const adsetId = "120228753459290513";       // Q Spot Ad Set ID
+    const monthlyIncrease = 265;                 // Amount to add
+    const daysToExtend = 30;                     // Extend by 30 days
+
+    console.log("🍽️ Starting Q Spot monthly update...");
+
+    try {
+        // Increase campaign lifetime budget
+        await updateCampaignBudget(campaignId, monthlyIncrease);
+        console.log(`💰 Campaign budget increased by +$${monthlyIncrease}`);
+
+        // Extend ad set end date
+        await extendAdSetEndDate(adsetId, daysToExtend);
+        console.log(`📅 Ad Set extended +${daysToExtend} days`);
+
+        console.log("🍽️ Q Spot monthly update completed.");
+    } catch (err) {
+        console.error("❌ Error in Q Spot update:", err.message);
+        throw err;
+    }
+}
 
 
 // Export it
@@ -410,6 +436,7 @@ module.exports = {
     handleMikeysUpdate,
     handleSistersOfTheNewSouthUpdate,
     handleMiddletonsMortuaryUpdate,
+    handleQSpotUpdate,
     updateAdSetBudget,
     extendAdSetEndDate
 };

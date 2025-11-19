@@ -110,6 +110,21 @@ if (event.type === 'invoice.payment_succeeded') {
         return res.status(200).json({ received: true });
     }
 }
+// ⭐ CLIENT 7 – Sisters of the New South (Kenneth Brown)
+if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const SISTERS_CUSTOMER_ID = "cus_RqnzWFn5JhZNOP";
+
+    if (invoice.customer === SISTERS_CUSTOMER_ID) {
+        console.log("🍗 Sisters of the New South payment detected!");
+
+        const { handleSistersOfTheNewSouthUpdate } = require('./facebookApi');
+        await handleSistersOfTheNewSouthUpdate();
+
+        return res.status(200).json({ received: true });
+    }
+}
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;

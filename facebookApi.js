@@ -304,6 +304,74 @@ async function handleMikeysUpdate() {
         throw err;
     }
 }
+// ⭐ CLIENT 7 – Sisters of the New South (Kenneth Brown)
+
+// Campaign A – Adset-level budgets + end dates
+async function handleSistersCampaignAUpdate() {
+    const adsetA1 = "120219858584840513";
+    const adsetA2 = "120224236882420513";
+    const weeklyIncreaseA = 45.57;
+    const daysToExtendA = 7;
+
+    console.log("🍗 Sisters of the New South – Campaign A update starting...");
+
+    try {
+        // Increase adset budgets
+        await updateAdSetBudget(adsetA1, weeklyIncreaseA);
+        await updateAdSetBudget(adsetA2, weeklyIncreaseA);
+        console.log(`💵 Campaign A: budgets increased by +$${weeklyIncreaseA} for both ad sets`);
+
+        // Extend adset end dates
+        await extendAdSetEndDate(adsetA1, daysToExtendA);
+        await extendAdSetEndDate(adsetA2, daysToExtendA);
+        console.log(`📅 Campaign A: both ad sets extended +${daysToExtendA} days`);
+
+    } catch (err) {
+        console.error("❌ Error in Sisters Campaign A update:", err.message);
+        throw err;
+    }
+}
+
+// Campaign B – Campaign-level budget + adset end dates
+async function handleSistersCampaignBUpdate() {
+    const campaignBId = "120215309917460513";
+    const adsetB1 = "120215309917450513";
+    const adsetB2 = "120228847438770513";
+    const weeklyIncreaseB = 66.25;
+    const daysToExtendB = 7;
+
+    console.log("🍗 Sisters of the New South – Campaign B update starting...");
+
+    try {
+        // Increase campaign lifetime budget (uses your existing helper)
+        await updateCampaignBudget(campaignBId, weeklyIncreaseB);
+        console.log(`💵 Campaign B: campaign budget increased by +$${weeklyIncreaseB}`);
+
+        // Extend adset end dates
+        await extendAdSetEndDate(adsetB1, daysToExtendB);
+        await extendAdSetEndDate(adsetB2, daysToExtendB);
+        console.log(`📅 Campaign B: both ad sets extended +${daysToExtendB} days`);
+
+    } catch (err) {
+        console.error("❌ Error in Sisters Campaign B update:", err.message);
+        throw err;
+    }
+}
+
+// Master handler – run both Campaign A and B for this client
+async function handleSistersOfTheNewSouthUpdate() {
+    console.log("🍗 Starting Sisters of the New South full weekly update (Campaign A + B)...");
+
+    try {
+        await handleSistersCampaignAUpdate();
+        await handleSistersCampaignBUpdate();
+
+        console.log("✅ Sisters of the New South weekly update completed (Campaign A + B).");
+    } catch (err) {
+        console.error("❌ Error in Sisters of the New South master update:", err.message);
+        throw err;
+    }
+}
 
 
 // Export it
@@ -315,9 +383,11 @@ module.exports = {
     handleSaltAndKoUpdate,
     handleBigZaddysUpdate,
     handleMikeysUpdate,
+    handleSistersOfTheNewSouthUpdate,
     updateAdSetBudget,
     extendAdSetEndDate
 };
+
 
 
 

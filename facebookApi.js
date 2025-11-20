@@ -27,31 +27,43 @@ async function updateCampaign(amount) {
 }
 
 module.exports = updateCampaign;
-// ⭐ Update Ad Set Budget
+// 🔥 Update AdSet Budget by ADDING to the current budget
 async function updateAdSetBudget(adsetId, increaseAmount) {
-
-    const url = `https://graph.facebook.com/v19.0/${adsetId}`;
     const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
 
-    try {
-        console.log(`➡️ Updating ad set ${adsetId} budget by $${increaseAmount}`);
+    // 1️⃣ Get current ad set info first
+    const readUrl = `https://graph.facebook.com/v19.0/${adsetId}?fields=lifetime_budget&access_token=${accessToken}`;
+    const updateUrl = `https://graph.facebook.com/v19.0/${adsetId}`;
 
-        const response = await axios({
-            method: 'POST',
-            url: url,
+    try {
+        console.log(`🔍 Fetching current budget for ad set ${adsetId}...`);
+
+        const readResponse = await axios.get(readUrl);
+        const currentBudget = Number(readResponse.data.lifetime_budget);
+
+        console.log(`💰 Current budget: $${currentBudget / 100}`);
+
+        // 2️⃣ Add weekly increase to the current budget
+        const newBudget = currentBudget + Math.round(increaseAmount * 100);
+
+        console.log(`📈 New budget will be: $${newBudget / 100}`);
+
+        // 3️⃣ Send update to Facebook
+        const updateResponse = await axios.post(updateUrl, null, {
             params: {
                 access_token: accessToken,
-                lifetime_budget: Math.round(increaseAmount * 100)  // Facebook expects cents
+                lifetime_budget: newBudget
             }
         });
 
-        console.log(`✔️ Budget updated for ad set ${adsetId}:`, response.data);
+        console.log(`✔️ Updated ad set ${adsetId} to new budget: ${newBudget / 100}`, updateResponse.data);
 
     } catch (err) {
         console.error(`❌ Error updating budget for ad set ${adsetId}:`, err.response?.data || err.message);
         throw err;
     }
 }
+
 
 // ⭐ Extend Ad Set End Date
 async function extendAdSetEndDate(adsetId, daysToAdd) {
@@ -428,7 +440,7 @@ async function handleQSpotUpdate() {
 
 // Export it
 module.exports = {
-    updateCampaignBudget,
+    updateCampaign,                // FIXED
     handleScoopsAndSubsPayment,
     handleClientTwoWeeklyUpdate,
     handleSpillTheBeansUpdate,
@@ -441,6 +453,7 @@ module.exports = {
     updateAdSetBudget,
     extendAdSetEndDate
 };
+
 
 
 

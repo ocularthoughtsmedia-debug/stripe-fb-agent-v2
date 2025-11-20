@@ -280,23 +280,23 @@ async function handleBigZaddysUpdate() {
 // ⭐ CLIENT 6 – Mikey's Drive Thru Weekly Update (AdSet Budgets + End Dates)
 async function handleMikeysUpdate() {
 
-    const adset1 = "120229009215660513";  // Mikey's Ad Set 1 ID
-    const adset2 = "120232388733760513";  // Mikey's Ad Set 2 ID
+    const adset1 = "120229009215670513";   // ✅ Corrected Ad Set 1 ID
+    const adset2 = "120232388733760513";   // Correct Ad Set 2 ID
     const weeklyIncrease = 66.25;
     const daysToExtend = 7;
 
     console.log("🍔 Starting Mikey's Drive Thru weekly update...");
 
     try {
-        // Increase ad set budgets
+        // Increase budgets
         await updateAdSetBudget(adset1, weeklyIncrease);
         await updateAdSetBudget(adset2, weeklyIncrease);
-        console.log(`💸 Budgets increased by +$${weeklyIncrease} for both ad sets`);
+        console.log(`💵 Budgets increased by +$${weeklyIncrease} for both ad sets`);
 
         // Extend end dates
         await extendAdSetEndDate(adset1, daysToExtend);
         await extendAdSetEndDate(adset2, daysToExtend);
-        console.log(`⏳ Ad Sets extended +${daysToExtend} days each`);
+        console.log(`📅 Ad Sets extended +${daysToExtend} days each`);
 
         console.log("✅ Mikey's Drive Thru weekly update completed.");
     } catch (err) {
@@ -304,6 +304,7 @@ async function handleMikeysUpdate() {
         throw err;
     }
 }
+
 // ⭐ CLIENT 7 – Sisters of the New South (Kenneth Brown)
 
 // Campaign A – Adset-level budgets + end dates

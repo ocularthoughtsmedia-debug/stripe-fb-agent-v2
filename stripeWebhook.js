@@ -119,14 +119,10 @@ if (event.type === 'invoice.payment_succeeded') {
     if (invoice.customer === SISTERS_CUSTOMER_ID) {
         console.log("🍽️ Sisters of the New South payment detected!");
 
-        const {
-            handleSistersCampaignAUpdate,
-            handleSistersCampaignBUpdate
-        } = require('./facebookApi');
+        const { handleSistersOfTheNewSouthUpdate } = require('./facebookApi');
 
-        // Run BOTH campaigns
-        await handleSistersCampaignAUpdate();
-        await handleSistersCampaignBUpdate();
+await handleSistersOfTheNewSouthUpdate();
+
 
         return res.status(200).json({ received: true });
     }

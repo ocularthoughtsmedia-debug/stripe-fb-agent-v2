@@ -36,7 +36,7 @@ async function updateAdSetBudget(adsetId, increaseAmount) {
     const updateUrl = `https://graph.facebook.com/v19.0/${adsetId}`;
 
     try {
-        console.log(`🔍 Fetching current budget for ad set ${adsetId}...`);
+        console.log(`📘 Fetching current budget for ad set ${adsetId}...`);
 
         const readResponse = await axios.get(readUrl);
         const currentBudget = Number(readResponse.data.lifetime_budget);
@@ -46,7 +46,7 @@ async function updateAdSetBudget(adsetId, increaseAmount) {
         // 2️⃣ Add weekly increase to the current budget
         const newBudget = currentBudget + Math.round(increaseAmount * 100);
 
-        console.log(`📈 New budget will be: $${newBudget / 100}`);
+        console.log(`🆕 New budget will be: $${newBudget / 100}`);
 
         // 3️⃣ Send update to Facebook
         const updateResponse = await axios.post(updateUrl, null, {
@@ -56,13 +56,14 @@ async function updateAdSetBudget(adsetId, increaseAmount) {
             }
         });
 
-        console.log(`✔️ Updated ad set ${adsetId} to new budget: ${newBudget / 100}`, updateResponse.data);
+        console.log(`✔️ Updated ad set ${adsetId} to new budget: $${newBudget / 100}`, updateResponse.data);
 
     } catch (err) {
         console.error(`❌ Error updating budget for ad set ${adsetId}:`, err.response?.data || err.message);
         throw err;
     }
 }
+
 
 
 // ⭐ Extend Ad Set End Date

@@ -263,7 +263,7 @@ async function handleSaltAndKoUpdate() {
 async function handleBigZaddysUpdate() {
 
     const adset1 = "120230224956520513";
-    const adset2 = "120230224956530513";
+    const adset2 = "120231973096780513";
     const adset3 = "120233905457990513";
 
     const weeklyIncrease = 66.25;

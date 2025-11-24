@@ -15,11 +15,13 @@ const sig = req.headers['stripe-signature'];
     console.error('⚠️ Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-// ✅ Ignore old Stripe event so Stripe stops retrying
-    if (event.id === "evt_1SW2owBjZM51OgBk42BvHfFZZ") {
-        console.log("Ignoring old Stripe event:", event.id);
-        return res.status(200).json({ received: true });
-    }
+
+// ✅ Ignore this specific old Stripe event so it stops retrying
+if (event.id === "evt_1SW2owBjZM5iQBk42BvHfZz7") {
+    console.log("Ignoring old Stripe event:", event.id);
+    return res.status(200).json({ received: true });
+}
+
   // ✅ Stripe event verified — now handle it // ⭐ SCOOPS & SUBS — Detect this client's payments ⭐// ⭐ CLIENT: Automatic Weekly Update (Campaign Budget + End Dates)
 if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object;

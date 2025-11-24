@@ -6,7 +6,15 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 router.post('/', async (req, res) => {
-  const sig = req.headers['stripe-signature'];
+
+// TEMP fix: ignore this specific old Stripe event so it stops retrying
+if (event?.id === "evt_1SW2owBjZM5iQBk42BvHfZz7") {
+    console.log("Ignoring old event:", event.id);
+    return res.status(200).json({ received: true });
+}
+
+
+    const sig = req.headers['stripe-signature'];
   let event;
 
   try {

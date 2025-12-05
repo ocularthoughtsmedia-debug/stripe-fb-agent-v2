@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Stripe = require('stripe');
+const clients = require('./clients');  // ⭐ client registry
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -21,6 +22,21 @@ if (event.id === "evt_1SW2owBjZM5iQBk42BvHfZz7") {
     console.log("Ignoring old Stripe event:", event.id);
     return res.status(200).json({ received: true });
 }
+  // 🤖 AUTO-CLIENT HANDLER: use clients.js for new clients
+  if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object;
+
+    const clientConfig = clients[invoice.customer];
+
+    if (clientConfig) {
+      console.log('🤖 Auto client match for', clientConfig.name, '(', invoice.customer, ')');
+      const { handleRegistryClientUpdate } = require('./facebookApi');
+
+      await handleRegistryClientUpdate(clientConfig);
+
+      return res.status(200).json({ received: true });
+    }
+  }
 
   // ✅ Stripe event verified — now handle it // ⭐ SCOOPS & SUBS — Detect this client's payments ⭐// ⭐ CLIENT: Automatic Weekly Update (Campaign Budget + End Dates)
 if (event.type === 'invoice.payment_succeeded') {

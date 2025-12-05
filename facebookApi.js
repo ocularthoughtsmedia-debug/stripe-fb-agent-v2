@@ -438,6 +438,28 @@ async function handleQSpotUpdate() {
     }
 }
 
+// ⭐ Generic handler for clients defined in clients.js
+async function handleRegistryClientUpdate(clientConfig) {
+  console.log(`🤖 Auto handler: updating client ${clientConfig.name}`);
+
+  for (const campaign of clientConfig.campaigns) {
+    if (campaign.type === "adset") {
+      // Adset-level budgets + end dates
+      for (const adsetId of campaign.adsets) {
+        console.log(`   → Updating ad set ${adsetId} by +$${campaign.increase}`);
+        await updateAdSetBudget(adsetId, campaign.increase);
+        console.log(`   → Extending ad set ${adsetId} by +${campaign.extendDays} days`);
+        await extendAdSetEndDate(adsetId, campaign.extendDays);
+      }
+    } else {
+      console.log(
+        `⚠️ Unknown campaign type "${campaign.type}" for client ${clientConfig.name} – skipping`
+      );
+    }
+  }
+
+  console.log(`✅ Auto handler finished for ${clientConfig.name}`);
+}
 
 // Export it
 module.exports = {
@@ -452,7 +474,8 @@ module.exports = {
     handleMiddletonsMortuaryUpdate,
     handleQSpotUpdate,
     updateAdSetBudget,
-    extendAdSetEndDate
+    extendAdSetEndDate,
+    handleRegistryClientUpdate
 };
 
 

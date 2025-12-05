@@ -1,24 +1,35 @@
 // clients.js
 //
-// This file controls ALL “auto-handled” clients in your automation system.
-// Add / edit clients here ONLY – not in stripeWebhook.js or facebookApi.js.
+// This file controls ALL “registry clients” in your automation system.
+// Only add new clients here. Existing hard-coded clients in
+// stripeWebhook.js will keep working as-is.
 
 module.exports = {
-  /*
-  "cus_123ABC": {
-    name: "Example Restaurant",
-    campaigns: [
-      {
-        // For now we support adset-level budgets + end-date extension
-        type: "adset",           // "adset" | (we can add others later)
-        increase: 66.25,         // how much to ADD to each ad set budget
-        extendDays: 7,           // how many days to extend the end date
-        adsets: [
-          "ADSET_ID_1",
-          "ADSET_ID_2"
-        ]
-      }
-    ]
-  },
-  */
+  // EXAMPLE – use this pattern for NEW clients only.
+  //
+  // "cus_NEWCLIENTID": {
+  //   name: "New Restaurant Name",
+  //   campaigns: [
+  //     {
+  //       type: "adset",
+  //       increase: 66.25,      // amount to add each billing period
+  //       extendDays: 7,        // how many days to extend
+  //       adsets: [
+  //         "ADSET_ID_1",
+  //         "ADSET_ID_2"
+  //       ]
+  //     },
+  //     {
+  //       type: "campaign",
+  //       campaignId: "CAMPAIGN_ID_HERE",
+  //       increase: 66.25,
+  //       extendDays: 7,
+  //       adsets: [
+  //         "ADSET_ID_FOR_ENDDATE_1",
+  //         "ADSET_ID_FOR_ENDDATE_2"
+  //       ]
+  //     }
+  //   ]
+  // }
+
 };

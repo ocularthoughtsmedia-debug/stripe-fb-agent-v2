@@ -1,32 +1,30 @@
 // sendSms.js
-// Simple Twilio SMS helper. Requires TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_PHONE in .env
-
 const twilio = require('twilio');
 
-let client;
-try {
-  client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-} catch (err) {
-  // Keep module load-safe if env vars missing; actual send calls will fail until configured.
-  console.warn('⚠️ Twilio client not configured. Check TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN in .env');
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+
+if (!accountSid || !authToken || !fromNumber) {
+  console.warn('⚠️ Twilio environment variables missing.');
 }
 
-async function sendSms(to, message) {
-  if (!client) {
-    console.error('❌ Twilio client missing. Cannot send SMS to', to);
-    return;
-  }
+const client = twilio(accountSid, authToken);
 
+async function sendSms(to, body) {
   try {
     const msg = await client.messages.create({
-      body: message,
-      from: process.env.TWILIO_PHONE,
+      from: fromNumber,
       to,
+      body,
     });
-    console.log(`📲 SMS sent to ${to} — SID: ${msg.sid}`);
+
+    console.log(`📨 SMS sent to ${to}. SID: ${msg.sid}`);
+    return msg;
   } catch (err) {
-    console.error('❌ Failed to send SMS:', err.message || err);
+    console.error('❌ Error sending SMS:', err.response?.data || err.message);
+    throw err;
   }
 }
 
-module.exports = sendSms;
+module.exports = { sendSms };

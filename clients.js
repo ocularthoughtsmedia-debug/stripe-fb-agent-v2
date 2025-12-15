@@ -31,6 +31,7 @@ module.exports = {
   // --------------------------------------
   "cus_TZaC5DLP8RGTxn": {
     name: "Tierra Rivers - Carolina Hair Restoration Center",
+     phone: "+18438176803", // <-- client phone number (E.164)
     campaigns: [
       {
         type: "adset",

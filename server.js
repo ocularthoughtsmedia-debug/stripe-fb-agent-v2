@@ -8,6 +8,9 @@ app.use('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
 // Apply express.json() globally AFTER webhook
 app.use(express.json());
 
+const { startReminderLoop } = require("./reminderRunner");
+startReminderLoop();
+
 // Example: Mount other routes
 // app.use('/sms', require('./sendSms'));
 

@@ -17,6 +17,34 @@ const sig = req.headers['stripe-signature'];
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
+  const { scheduleFailedInvoice, markPaid } = require("./reminderRunner");
+
+// ...
+if (event.type === "invoice.payment_failed") {
+  const invoice = event.data.object;
+
+  // invoice.hosted_invoice_url is usually what you want
+  scheduleFailedInvoice({
+    customerId: invoice.customer,
+    invoiceId: invoice.id,
+    invoiceUrl: invoice.hosted_invoice_url || invoice.invoice_pdf || "",
+    amountDue: invoice.amount_due,
+  });
+
+  return res.status(200).json({ received: true });
+}
+
+if (event.type === "invoice.payment_succeeded" || event.type === "invoice.paid") {
+  const invoice = event.data.object;
+
+  markPaid({
+    customerId: invoice.customer,
+    invoiceId: invoice.id,
+  });
+
+  // keep your existing “update Facebook budgets/end dates” logic below
+}
+
 // ✅ Ignore this specific old Stripe event so it stops retrying
 if (event.id === "evt_1SW2owBjZM5iQBk42BvHfZz7") {
     console.log("Ignoring old Stripe event:", event.id);

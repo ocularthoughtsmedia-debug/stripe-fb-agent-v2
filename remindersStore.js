@@ -1,39 +1,56 @@
+// remindersStore.js
 const fs = require("fs");
 const path = require("path");
 
-const FILE = path.join(__dirname, "reminders.json");
+const STORE_PATH = path.join(__dirname, "reminders.json");
 
-function load() {
+function loadStore() {
   try {
-    return JSON.parse(fs.readFileSync(FILE, "utf8"));
-  } catch {
-    return {};
+    if (!fs.existsSync(STORE_PATH)) return { invoices: {} };
+    const raw = fs.readFileSync(STORE_PATH, "utf-8");
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== "object") return { invoices: {} };
+    if (!data.invoices) data.invoices = {};
+    return data;
+  } catch (e) {
+    console.error("❌ remindersStore load error:", e.message);
+    return { invoices: {} };
   }
 }
 
-function save(data) {
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
+function saveStore(store) {
+  fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2));
 }
 
-function get(key) {
-  const data = load();
-  return data[key] || null;
+function upsertInvoice(invoiceId, patch) {
+  const store = loadStore();
+  if (!store.invoices[invoiceId]) store.invoices[invoiceId] = {};
+  store.invoices[invoiceId] = { ...store.invoices[invoiceId], ...patch };
+  saveStore(store);
+  return store.invoices[invoiceId];
 }
 
-function set(key, value) {
-  const data = load();
-  data[key] = value;
-  save(data);
+function getInvoice(invoiceId) {
+  const store = loadStore();
+  return store.invoices[invoiceId] || null;
 }
 
-function del(key) {
-  const data = load();
-  delete data[key];
-  save(data);
+function markInvoicePaid(invoiceId) {
+  return upsertInvoice(invoiceId, { status: "paid", paidAt: Date.now() });
 }
 
-function all() {
-  return load();
+function listUnpaidInvoices() {
+  const store = loadStore();
+  return Object.entries(store.invoices)
+    .map(([invoiceId, v]) => ({ invoiceId, ...v }))
+    .filter((v) => v.status !== "paid");
 }
 
-module.exports = { load, save, get, set, del, all };
+module.exports = {
+  loadStore,
+  saveStore,
+  upsertInvoice,
+  getInvoice,
+  markInvoicePaid,
+  listUnpaidInvoices,
+};

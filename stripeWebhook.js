@@ -16,8 +16,72 @@ const sig = req.headers['stripe-signature'];
     console.error('⚠️ Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
+// ===============================
+// REGISTRY CLIENT HANDLER (Tierra + future new clients)
+// ===============================
+const { handleRegistryClientUpdate } = require('./facebookApi');
+const { scheduleFailedInvoice, markPaid } = require('./reminderRunner');
 
-  const { scheduleFailedInvoice, markPaid } = require("./reminderRunner");
+// Payment failed → schedule reminders (NO Facebook updates)
+if (event.type === "invoice.payment_failed") {
+  const invoice = event.data.object;
+  const client = clients[invoice.customer];
+
+  if (client) {
+    console.log(`📩 Payment failed for registry client: ${client.name}`);
+
+    scheduleFailedInvoice({
+      customerId: invoice.customer,
+      invoiceId: invoice.id,
+      invoiceUrl: invoice.hosted_invoice_url || invoice.invoice_pdf || "",
+      amountDue: invoice.amount_due,
+      phone: client.phone,
+      timezone: client.timezone
+    });
+  } else {
+    console.log(`⚠️ Payment failed for unknown customer: ${invoice.customer}`);
+  }
+
+  return res.status(200).json({ received: true });
+}
+
+// Payment succeeded → cancel reminders + update ads
+if (event.type === "invoice.payment_succeeded" || event.type === "invoice.paid") {
+  const invoice = event.data.object;
+  const client = clients[invoice.customer];
+
+  if (client) {
+    console.log(`✅ Payment recovered for registry client: ${client.name}`);
+    markPaid({ invoiceId: invoice.id });
+
+    // Trigger Facebook updates using the registry config
+    await handleRegistryClientUpdate(client);
+
+    return res.status(200).json({ received: true });
+  }
+}
+
+
+  // --- PAYMENT FAILED: schedule reminders (NO Facebook updates)
+if (event.type === "invoice.payment_failed") {
+  const invoice = event.data.object;
+
+  scheduleFailedInvoice({
+    customerId: invoice.customer,
+    invoiceId: invoice.id,
+    invoiceUrl: invoice.hosted_invoice_url || invoice.invoice_pdf || "",
+    amountDue: invoice.amount_due,
+  });
+
+  return res.status(200).json({ received: true });
+}
+
+// --- PAYMENT SUCCEEDED / PAID: stop reminders
+if (event.type === "invoice.paid" || event.type === "invoice.payment_succeeded") {
+  const invoice = event.data.object;
+  markPaid({ invoiceId: invoice.id });
+  // DO NOT return — let FB logic continue
+}
 
 // ...
 if (event.type === "invoice.payment_failed") {

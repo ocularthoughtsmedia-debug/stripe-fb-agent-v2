@@ -1,19 +1,25 @@
-const express = require('express');
+require("dotenv").config();
+
+const express = require("express");
 const app = express();
 
-// Mount /webhook route with raw body parser BEFORE json()
-const stripeWebhook = require('./stripeWebhook');
-app.use('/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
+// ✅ Stripe webhook MUST use raw body (so signature verification works)
+const stripeWebhook = require("./stripeWebhook");
+app.use("/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
-// Apply express.json() globally AFTER webhook
+// ✅ All other routes can use JSON parsing
 app.use(express.json());
 
-const { startReminderLoop } = require("./reminderRunner");
-startReminderLoop();
+// ✅ Import reminder runner functions ONCE (no duplicates)
+const { startReminderRunner, scheduleFailedInvoice, markPaid } = require("./reminderRunner");
 
-// Example: Mount other routes
-// app.use('/sms', require('./sendSms'));
+startReminderRunner();
 
+
+// ✅ Health check
+app.get("/", (req, res) => res.send("OK"));
+
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Server listening on port ${PORT}`);

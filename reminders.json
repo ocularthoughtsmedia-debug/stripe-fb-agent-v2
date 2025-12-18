@@ -1,0 +1,15 @@
+[
+  {
+    "customerId": "cus_TZaC5DLP8RGTxn",
+    "invoiceId": "in_test_fail_123",
+    "invoiceUrl": "https://example.com/pay",
+    "amountDue": 6625,
+    "status": "paid",
+    "attempts": 1,
+    "lastSentAt": "2025-12-18T07:16:07.294-05:00",
+    "nextSendAt": null,
+    "createdAt": "2025-12-18T07:14:59.688-05:00",
+    "stoppedAt": "2025-12-18T07:06:56.818-05:00",
+    "paidAt": "2025-12-18T07:16:17.543-05:00"
+  }
+]

@@ -460,6 +460,42 @@ async function handleRegistryClientUpdate(clientConfig) {
 
   console.log(`✅ Auto handler finished for ${clientConfig.name}`);
 }
+// Pull last 30 days campaign-level metrics
+async function getCampaign30DayInsights(campaignId) {
+  const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
+  const url = `https://graph.facebook.com/v19.0/${campaignId}/insights`;
+
+  const fields = [
+    "reach",
+    "frequency",
+    "impressions",
+    "unique_link_clicks",
+    "unique_ctr",
+    "post_reactions",
+    "post_comments",
+    "post_shares"
+  ].join(",");
+
+  const params = {
+    access_token: accessToken,
+    time_range: JSON.stringify({ since: "30 days ago", until: "today" }),
+    fields
+  };
+
+  const res = await axios.get(url, { params });
+  const row = res.data?.data?.[0] || {};
+
+  return {
+    reach: row.reach || 0,
+    frequency: row.frequency || 0,
+    impressions: row.impressions || 0,
+    unique_link_clicks: row.unique_link_clicks || 0,
+    unique_ctr: row.unique_ctr || 0,
+    post_reactions: row.post_reactions || 0,
+    post_comments: row.post_comments || 0,
+    post_shares: row.post_shares || 0
+  };
+}
 
 // Export it
 module.exports = {
@@ -475,7 +511,9 @@ module.exports = {
     handleQSpotUpdate,
     updateAdSetBudget,
     extendAdSetEndDate,
-    handleRegistryClientUpdate
+    handleRegistryClientUpdate,
+    getCampaign30DayInsights,
+
 };
 
 

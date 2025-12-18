@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Stripe = require('stripe');
 const clients = require('./clients');  // ⭐ client registry
+const { getClientReportState, setClientReportState } = require("./reportsStore");
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -52,7 +53,21 @@ if (event.type === "invoice.payment_succeeded" || event.type === "invoice.paid")
 
   if (client) {
     console.log(`✅ Payment recovered for registry client: ${client.name}`);
-    markPaid({ invoiceId: invoice.id });
+    markPaid({ invoiceId: invoice.id }); const state = getClientReportState(invoice.customer);
+const billing = client.billing || { paymentsPerCycle: 4, reportDelayDays: 2 };
+
+if (state.cycleCount === 0) state.cycleStartAt = Date.now();
+state.cycleCount += 1;
+state.lastPaymentAt = Date.now();
+
+// when 4th payment hits → schedule report 2 days later
+if (state.cycleCount === billing.paymentsPerCycle) {
+  state.reportScheduledAt = Date.now() + (billing.reportDelayDays * 24 * 60 * 60 * 1000);
+  console.log(`📌 Scheduled 30-day report for ${client.name} in ${billing.reportDelayDays} days`);
+}
+
+setClientReportState(invoice.customer, state);
+
 
     // Trigger Facebook updates using the registry config
     await handleRegistryClientUpdate(client);

@@ -30,20 +30,31 @@ module.exports = {
   // ⭐ Tierra Rivers – Carolina Hair Restoration Center
   // --------------------------------------
   "cus_TZaC5DLP8RGTxn": {
-    name: "Tierra Rivers - Carolina Hair Restoration Center",
-     phone: "+18438176803", // <-- client phone number (E.164)
-      timezone: "America/New_York",
-    campaigns: [
-      {
-        type: "adset",
-        increase: 66.25,
-        extendDays: 7,
-        adsets: [
-          "120215555974230513"
-        ]
-      }
-    ]
-  }
+  name: "Tierra Rivers - Carolina Hair Restoration Center",
+  phone: "+18438176803",
+  timezone: "America/New_York",
+
+  billing: {
+    cadence: "weekly",
+    paymentsPerCycle: 4,     // 4 weekly payments = 1 “month”
+    reportDelayDays: 2       // send report 2 days after payment #4
+  },
+
+  analytics: {
+    level: "campaign",
+    campaignIds: ["1202XXXXXXXXXXXXXXX"]   // <-- put her campaign ID here
+  },
+
+  campaigns: [
+    {
+      type: "adset",
+      increase: 66.25,
+      extendDays: 7,
+      adsets: ["120215555974230513"]
+    }
+  ]
+}
+
 
   // Add more registry clients below using this same pattern
 

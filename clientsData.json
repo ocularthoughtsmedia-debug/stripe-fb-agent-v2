@@ -1,8 +1,4 @@
-// clients.js
-// AUTO-GENERATED FILE — DO NOT EDIT MANUALLY
-// Edit clientsData.json and run: node generateClientsJs.js
-
-module.exports = {
+{
   "cus_TZaC5DLP8RGTxn": {
     "name": "Tierra Rivers - Carolina Hair Restoration Center",
     "phone": "+18438176803",
@@ -14,19 +10,15 @@ module.exports = {
     },
     "analytics": {
       "level": "campaign",
-      "campaignIds": [
-        "PASTE_CAMPAIGN_ID_HERE"
-      ]
+      "campaignIds": ["PASTE_CAMPAIGN_ID_HERE"]
     },
     "campaigns": [
       {
         "type": "adset",
         "increase": 66.25,
         "extendDays": 7,
-        "adsets": [
-          "120215555974230513"
-        ]
+        "adsets": ["120215555974230513"]
       }
     ]
   }
-};
+}

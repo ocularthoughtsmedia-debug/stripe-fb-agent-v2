@@ -444,18 +444,32 @@ async function handleRegistryClientUpdate(clientConfig) {
 
   for (const campaign of clientConfig.campaigns) {
     if (campaign.type === "adset") {
-      // Adset-level budgets + end dates
-      for (const adsetId of campaign.adsets) {
-        console.log(`   → Updating ad set ${adsetId} by +$${campaign.increase}`);
-        await updateAdSetBudget(adsetId, campaign.increase);
-        console.log(`   → Extending ad set ${adsetId} by +${campaign.extendDays} days`);
-        await extendAdSetEndDate(adsetId, campaign.extendDays);
-      }
-    } else {
-      console.log(
-        `⚠️ Unknown campaign type "${campaign.type}" for client ${clientConfig.name} – skipping`
-      );
+  // Adset-level budgets + end dates
+  for (const adsetId of campaign.adsets) {
+    await updateAdSetBudget(adsetId, campaign.increase);
+    await extendAdSetEndDate(adsetId, campaign.extendDays);
+  }
+
+} else if (campaign.type === "enddate_only") {
+  // ✅ End date only (daily budgets — do NOT change budget)
+  for (const adsetId of campaign.adsets) {
+    await extendAdSetEndDate(adsetId, campaign.extendDays);
+  }
+
+} else if (campaign.type === "campaign") {
+  // Campaign-level budget + (optional) adset end dates
+  await updateCampaignBudget(campaign.campaignId, campaign.increase);
+
+  if (campaign.adsets?.length) {
+    for (const adsetId of campaign.adsets) {
+      await extendAdSetEndDate(adsetId, campaign.extendDays);
     }
+  }
+
+} else {
+  console.log(`⚠️ Unknown campaign type "${campaign.type}" for client ${clientConfig.name} – skipping`);
+}
+
   }
 
   console.log(`✅ Auto handler finished for ${clientConfig.name}`);

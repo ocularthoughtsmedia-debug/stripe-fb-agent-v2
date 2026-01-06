@@ -13,12 +13,12 @@
       "campaignIds": ["PASTE_CAMPAIGN_ID_HERE"]
     },
     "campaigns": [
-      {
-        "type": "adset",
-        "increase": 66.25,
-        "extendDays": 7,
-        "adsets": ["120215555974230513"]
-      }
-    ]
+  {
+    "type": "enddate_only",
+    "extendDays": 7,
+    "adsets": ["120215555974230513"]
+  }
+]
+
   }
 }

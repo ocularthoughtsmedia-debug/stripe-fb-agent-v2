@@ -53,7 +53,8 @@ if (event.type === "invoice.payment_succeeded" || event.type === "invoice.paid")
 
   if (client) {
     console.log(`✅ Payment recovered for registry client: ${client.name}`);
-    markPaid({ invoiceId: invoice.id }); const state = getClientReportState(invoice.customer);
+    markPaid({ invoiceId: invoice.id }); 
+    const state = getClientReportState(invoice.customer);
 const billing = client.billing || { paymentsPerCycle: 4, reportDelayDays: 2 };
 
 if (state.cycleCount === 0) state.cycleStartAt = Date.now();

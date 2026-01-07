@@ -14,6 +14,8 @@ app.use(express.json());
 const { startReminderRunner, scheduleFailedInvoice, markPaid } = require("./reminderRunner");
 
 startReminderRunner();
+const { startReportRunner } = require("./reportRunner");
+startReportRunner();
 
 
 // ✅ Health check

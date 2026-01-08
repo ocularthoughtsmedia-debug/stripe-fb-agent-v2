@@ -351,7 +351,8 @@ async function handleSistersCampaignBUpdate() {
     const campaignBId = "120215309917460513";
     const adsetB1 = "120215309917450513";
     const adsetB2 = "120228847438770513";
-    const weeklyIncreaseB = 66.25;
+    const adsetB3 = "120237988282320513";
+    const weeklyIncreaseB = 132.50;
     const daysToExtendB = 7;
 
     console.log("🍗 Sisters of the New South – Campaign B update starting...");
@@ -364,6 +365,7 @@ async function handleSistersCampaignBUpdate() {
         // Extend adset end dates
         await extendAdSetEndDate(adsetB1, daysToExtendB);
         await extendAdSetEndDate(adsetB2, daysToExtendB);
+        await extendAdSetEndDate(adsetB3, daysToExtendB);
         console.log(`📅 Campaign B: both ad sets extended +${daysToExtendB} days`);
 
     } catch (err) {

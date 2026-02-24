@@ -27,5 +27,32 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_RqnzWFn5JhZNOP": {
+    "name": "Sisters of the New South - Kenneth Brown",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120208225851280513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120215282436070513",
+          "120208225851570513"
+        ]
+      }
+    ]
   }
 };

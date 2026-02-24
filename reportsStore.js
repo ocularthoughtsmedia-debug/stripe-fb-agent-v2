@@ -19,7 +19,9 @@ function getClientReportState(customerId) {
     cycleStartAt: null,
     lastPaymentAt: null,
     reportScheduledAt: null,
-    reportSentAt: null
+    reportSentAt: null,
+    lastInvoiceIdProcessed: null,
+lastInvoiceProcessedAt: null,
   };
 }
 

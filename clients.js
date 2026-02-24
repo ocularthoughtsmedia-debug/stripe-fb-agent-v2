@@ -54,5 +54,209 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_SDerLwePwWxkc5": {
+    "name": "Boscoe's Babys",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120217539262580513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "campaign",
+        "campaignId": "120217539262580513",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120217539262570513",
+          "120228751295640513"
+        ]
+      }
+    ]
+  },
+  "cus_StFbuW9XQ1IERH": {
+    "name": "Scoops & Subs",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": []
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120227144383810513",
+          "120231017436880513"
+        ]
+      }
+    ]
+  },
+  "cus_TEyLO2B2ut8Mcx": {
+    "name": "Spill The Beans",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": []
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120230160869600513"
+        ]
+      }
+    ]
+  },
+  "cus_SyBU8uZluGlMnx": {
+    "name": "Salt & KO",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": []
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120226475065410513",
+          "120232314137180513"
+        ]
+      }
+    ]
+  },
+  "cus_T9qdTAlveyKzmV": {
+    "name": "Big Zaddy’s Burgers",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": []
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120230224956520513",
+          "120231973096780513",
+          "120233905457990513"
+        ]
+      }
+    ]
+  },
+  "cus_T4otdg14dN1oVK": {
+    "name": "Mikey's Drive Thru",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": []
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120229009215670513",
+          "120232388733760513"
+        ]
+      }
+    ]
+  },
+  "cus_RVuVWsYQeqaWk4": {
+    "name": "Middleton's Mortuary",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "monthly",
+      "paymentsPerCycle": 1,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": []
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 177,
+        "extendDays": 30,
+        "adsets": [
+          "120214022610590513"
+        ]
+      }
+    ]
+  },
+  "cus_TOAHOHfXHuTdKU": {
+    "name": "The Q Spot",
+    "phone": "",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "monthly",
+      "paymentsPerCycle": 1,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120207128523590513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "campaign",
+        "campaignId": "120207128523590513",
+        "increase": 265,
+        "extendDays": 30,
+        "adsets": [
+          "120228753459290513"
+        ]
+      }
+    ]
   }
 };

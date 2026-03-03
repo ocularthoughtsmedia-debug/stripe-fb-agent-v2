@@ -15,7 +15,7 @@ module.exports = {
     "analytics": {
       "level": "campaign",
       "campaignIds": [
-        "PASTE_CAMPAIGN_ID_HERE"
+        "120215174799750513"
       ]
     },
     "campaigns": [
@@ -178,7 +178,7 @@ module.exports = {
         "adsets": [
           "120230224956520513",
           "120231973096780513",
-          "120233905457990513"
+          "120233905457990513,120240610821030513,120240611843250513"
         ]
       }
     ]

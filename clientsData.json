@@ -198,5 +198,27 @@
       ]
     }
   ]
+},
+
+"cus_U5X1Z3nkAEqTBK": {
+  "name": "Kenneth Sturrup - Mr. Nicks Sub Shop",
+  "phone": "",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120239111734130513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 66.25,
+      "extendDays": 7,
+      "adsets": [
+        "120239111734150513",
+        "120240742857570513",
+        "120240742976900513",
+        "120240743140170513",
+        "120240743262840513"
+      ]
+    }
+  ]
 }
 }

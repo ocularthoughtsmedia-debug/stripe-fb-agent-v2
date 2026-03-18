@@ -235,28 +235,31 @@ module.exports = {
     ]
   },
   "cus_TOAHOHfXHuTdKU": {
-    "name": "The Q Spot",
+    "name": "Rasheda Brown - The Q Spot",
     "phone": "",
     "timezone": "America/New_York",
     "billing": {
-      "cadence": "monthly",
-      "paymentsPerCycle": 1,
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
       "reportDelayDays": 2
     },
     "analytics": {
       "level": "campaign",
       "campaignIds": [
-        "120207128523590513"
+        "120239505668610513"
       ]
     },
     "campaigns": [
       {
-        "type": "campaign",
-        "campaignId": "120207128523590513",
-        "increase": 265,
-        "extendDays": 30,
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
         "adsets": [
-          "120228753459290513"
+          "120239505668580513",
+          "120239582103300513",
+          "120241373315180513",
+          "120241373466610513",
+          "120241373651430513"
         ]
       }
     ]

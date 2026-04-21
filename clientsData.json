@@ -247,5 +247,27 @@
       ]
     }
   ]
+},
+
+"cus_ULIPxPtdpO3j94": {
+  "name": "Latoya Williams - Smoked Out Tasty Bites",
+  "phone": "",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120242889535980513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 66.25,
+      "extendDays": 7,
+      "adsets": [
+        "120242889567210513",
+        "120242889710460513",
+        "120242890042340513",
+        "120242890257740513",
+        "120242890404550513"
+      ]
+    }
+  ]
 }
 }

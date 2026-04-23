@@ -83,24 +83,31 @@ router.post("/", async (req, res) => {
     // stop reminders for this invoice
     markPaid({ invoiceId: invoice.id });
 
-    // cycle/report tracking
-    const billing = client.billing || { paymentsPerCycle: 4, reportDelayDays: 2 };
+   // cycle/report tracking (TRUE 30-day schedule)
+const billing = client.billing || { reportDelayDays: 2 };
 
-    if (!state.cycleStartAt) state.cycleStartAt = Date.now();
-    state.cycleCount = Number(state.cycleCount || 0) + 1;
-    state.lastPaymentAt = Date.now();
+// Start cycle clock on first successful payment
+if (!state.cycleStartAt) {
+  state.cycleStartAt = Date.now();
 
-    state.lastInvoiceIdProcessed = invoice.id;
-    state.lastInvoiceProcessedAt = Date.now();
+  // schedule report for 30 days + delayDays after cycle start
+  const delayDays = Number(billing.reportDelayDays || 0);
+  state.reportScheduledAt =
+    state.cycleStartAt + (30 + delayDays) * 24 * 60 * 60 * 1000;
 
-    if (
-      state.cycleCount >= billing.paymentsPerCycle &&
-      !state.reportScheduledAt &&
-      !state.reportSentAt
-    ) {
-      state.reportScheduledAt = Date.now() + billing.reportDelayDays * 24 * 60 * 60 * 1000;
-      console.log(`📌 Scheduled 30-day report for ${client.name} in ${billing.reportDelayDays} days`);
-    }
+  console.log(
+    `📌 Scheduled 30-day report for ${client.name} at ${new Date(state.reportScheduledAt).toISOString()}`
+  );
+}
+
+// always track latest successful payment
+state.lastPaymentAt = Date.now();
+
+// keep your idempotency fields
+state.lastInvoiceIdProcessed = invoice.id;
+state.lastInvoiceProcessedAt = Date.now();
+
+setClientReportState(customerId, state);
 
     setClientReportState(customerId, state);
 

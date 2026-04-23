@@ -32,6 +32,12 @@ async function processDueReports() {
     // Only send if scheduled and not already sent
     if (!state.reportScheduledAt || state.reportSentAt) continue;
     if (now < state.reportScheduledAt) continue;
+    // skip if last payment is too old (prevents sending reports for delinquent clients)
+const cadence = client?.billing?.cadence || "weekly";
+const graceDays = cadence === "monthly" ? 45 : 14; // adjust if you want
+if (!state.lastPaymentAt || now - state.lastPaymentAt > graceDays * 24 * 60 * 60 * 1000) {
+  continue;
+}
 
     // Pull and compile metrics across all campaign IDs (campaign level)
     let combined = {

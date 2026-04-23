@@ -18,10 +18,16 @@ function getTwilioClient() {
 }
 
 async function sendSms(to, body) {
-  const from = process.env.TWILIO_PHONE_NUMBER;
-  if (!from) throw new Error("Missing TWILIO_PHONE_NUMBER");
-
   const client = getTwilioClient();
+
+  const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
+  const from = process.env.TWILIO_PHONE_NUMBER;
+
+  if (messagingServiceSid) {
+    return client.messages.create({ messagingServiceSid, to, body });
+  }
+
+  if (!from) throw new Error("Missing TWILIO_PHONE_NUMBER");
   return client.messages.create({ from, to, body });
 }
 

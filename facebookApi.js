@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { DateTime } = require('luxon');
 
 async function updateCampaign(amount) {
   const campaignId = process.env.FB_CAMPAIGN_ID;
@@ -492,11 +493,14 @@ async function getCampaign30DayInsights(campaignId) {
     "post_shares"
   ].join(",");
 
-  const params = {
-    access_token: accessToken,
-    time_range: JSON.stringify({ since: "30 days ago", until: "today" }),
-    fields
-  };
+  const since = DateTime.now().minus({ days: 30 }).toFormat("yyyy-MM-dd");
+const until = DateTime.now().toFormat("yyyy-MM-dd");
+
+const params = {
+  access_token: accessToken,
+  time_range: JSON.stringify({ since, until }),
+  fields
+};
 
   const res = await axios.get(url, { params });
   const row = res.data?.data?.[0] || {};

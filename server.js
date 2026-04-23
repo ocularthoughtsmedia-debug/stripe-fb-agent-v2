@@ -7,8 +7,14 @@ const app = express();
 const stripeWebhook = require("./stripeWebhook");
 app.use("/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
-// ✅ All other routes can use JSON parsing
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+app.post("/twilio/status", (req, res) => {
+  console.log("📬 Twilio delivery status callback:", req.body);
+  res.sendStatus(200);
+});
+
 
 // ✅ Import reminder runner functions ONCE (no duplicates)
 const { startReminderRunner, scheduleFailedInvoice, markPaid } = require("./reminderRunner");

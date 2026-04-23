@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { DateTime } = require("luxon");
-
+const { sendSms } = require("./twilioSms");
 const STORE_PATH = path.join(__dirname, "reminders.json");
 
 // How often to check the reminder store (seconds)
@@ -56,7 +56,7 @@ function markPaid({ invoiceId }) {
   writeStore(reminders);
 }
 
-function scheduleFailedInvoice({ customerId, invoiceId, invoiceUrl, amountDue }) {
+function scheduleFailedInvoice({ customerId, invoiceId, invoiceUrl, amountDue, phone, name }) {
   if (!invoiceId) throw new Error("invoiceId is required");
   if (!invoiceUrl) throw new Error("invoiceUrl is required");
 
@@ -65,6 +65,8 @@ function scheduleFailedInvoice({ customerId, invoiceId, invoiceUrl, amountDue })
 
   upsertReminder({
     customerId: customerId || null,
+    phone: phone || null,
+    name: name || null,
     invoiceId,
     invoiceUrl,
     amountDue: Number.isFinite(amountDue) ? amountDue : null,
@@ -77,15 +79,63 @@ function scheduleFailedInvoice({ customerId, invoiceId, invoiceUrl, amountDue })
 }
 
 async function sendReminder(reminder) {
-  // ✅ For now we just log. Later we’ll plug in Twilio/Google Voice.
-  console.log("📩 REMINDER SEND (stub)");
-  console.log({
-    invoiceId: reminder.invoiceId,
-    customerId: reminder.customerId,
-    invoiceUrl: reminder.invoiceUrl,
-    amountDue: reminder.amountDue,
-    attempts: reminder.attempts,
-  });
+  const clientPhone = reminder.phone; // stored with reminder
+  const clientName = reminder.name || "there";
+  const invoiceUrl = reminder.invoiceUrl;
+  const amountDue = reminder.amountDue;
+  const attemptNumber = Number(reminder.attempts || 0) + 1;
+
+  if (!clientPhone) {
+    console.log(`⚠️ No phone on reminder for invoice ${reminder.invoiceId}. Skipping.`);
+    return;
+  }
+
+  const dollars = Number.isFinite(amountDue) ? (amountDue / 100).toFixed(2) : null;
+
+  const body = [
+    `Ocular Thoughts Media: Hi ${clientName} — payment reminder${dollars ? ` ($${dollars})` : ""}.`,
+    `Pay here: ${invoiceUrl}`,
+    `Reply STOP to opt out, HELP for help.`,
+    `(Reminder ${attemptNumber}/${MAX_ATTEMPTS})`
+  ].join("\n");
+
+  console.log(`📲 Sending reminder ${attemptNumber}/${MAX_ATTEMPTS} to ${clientName} (${clientPhone})`);
+
+  try {
+    const msg = await sendSms(clientPhone, body);
+    console.log(`✅ SMS queued. SID: ${msg.sid}`);
+  } catch (err) {
+    const code = err?.code || err?.response?.data?.code;
+    const message = err?.message || err?.response?.data?.message;
+
+    console.log("❌ SMS send error:", code || "", message || "");
+
+    // If user opted out, stop permanently
+    if (String(code) === "21610") {
+      reminder.status = "opted_out";
+      reminder.nextSendAt = null;
+      reminder.optedOutAt = DateTime.now().toISO();
+      console.log(`🛑 Number opted out. Stopping reminders for ${reminder.invoiceId}`);
+    }
+
+    // A2P not approved yet (your current situation)
+    if (String(code) === "30034") {
+      console.log("⚠️ A2P not approved yet (30034). This will resolve after campaign approval.");
+    }
+
+    throw err;
+  }
+
+  // Optional: text you for monitoring (uses ADMIN_PHONE from env)
+  const adminPhone = process.env.ADMIN_PHONE;
+  if (adminPhone) {
+    const adminBody = `⚠️ Unpaid invoice reminder sent\nClient: ${clientName}\nAttempt: ${attemptNumber}/${MAX_ATTEMPTS}\nInvoice: ${invoiceUrl}`;
+    try {
+      await sendSms(adminPhone, adminBody);
+    } catch (e) {
+      console.log("⚠️ Could not text admin phone:", e.message);
+    }
+  }
 }
 
 let _runnerStarted = false;

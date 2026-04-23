@@ -43,6 +43,7 @@ router.post("/", async (req, res) => {
         invoiceUrl: invoice.hosted_invoice_url || invoice.invoice_pdf || "",
         amountDue: invoice.amount_due,
         phone: client.phone,
+        name: client.name,
         timezone: client.timezone,
       });
     } else {

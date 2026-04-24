@@ -269,5 +269,27 @@
       ]
     }
   ]
+},
+
+"cus_UNoXvoAOP3PuTl": {
+  "name": "Robin Andrews - Blue Collar Bistro",
+  "phone": "+18036409770",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120241661318510513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 66.25,
+      "extendDays": 7,
+      "adsets": [
+        "120241661318470513",
+        "120243282404570513",
+        "120243282472950513",
+        "120243282526820513",
+        "120243282589630513"
+      ]
+    }
+  ]
 }
 }

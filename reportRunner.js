@@ -16,7 +16,20 @@ function formatReport(clientName, metrics) {
     `Unique CTR: ${metrics.unique_ctr}\n` +
     `Reactions: ${metrics.post_reactions}\n` +
     `Comments: ${metrics.post_comments}\n` +
-    `Shares: ${metrics.post_shares}`
+    function formatReport(clientName, metrics) {
+  return (
+    `📊 30-Day Ad Report — ${clientName}\n` +
+    `Reach: ${metrics.reach}\n` +
+    `Frequency: ${metrics.frequency}\n` +
+    `Impressions: ${metrics.impressions}\n` +
+    `Unique Link Clicks: ${metrics.unique_link_clicks}\n` +
+    `Unique CTR: ${metrics.unique_ctr}\n` +
+    `Reactions: ${metrics.post_reactions}\n` +
+    `Comments: ${metrics.post_comments}\n` +
+    `Shares: ${metrics.post_shares}\n` +
+    `Reply STOP to opt out, HELP for help.`
+  );
+}
   );
 }
 

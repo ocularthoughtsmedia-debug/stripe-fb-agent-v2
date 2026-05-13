@@ -30,7 +30,7 @@ module.exports = {
   },
   "cus_RqnzWFn5JhZNOP": {
     "name": "Sisters of the New South - Kenneth Brown",
-    "phone": "",
+    "phone": "+19123080379",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",
@@ -85,7 +85,7 @@ module.exports = {
   },
   "cus_StFbuW9XQ1IERH": {
     "name": "Scoops & Subs",
-    "phone": "",
+    "phone": "+13862351470",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",
@@ -94,7 +94,9 @@ module.exports = {
     },
     "analytics": {
       "level": "campaign",
-      "campaignIds": []
+      "campaignIds": [
+        "120227144383820513"
+      ]
     },
     "campaigns": [
       {
@@ -187,7 +189,7 @@ module.exports = {
   },
   "cus_T4otdg14dN1oVK": {
     "name": "Mikey's Drive Thru",
-    "phone": "",
+    "phone": "+18038552738",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",
@@ -196,7 +198,9 @@ module.exports = {
     },
     "analytics": {
       "level": "campaign",
-      "campaignIds": []
+      "campaignIds": [
+        "120229009215660513"
+      ]
     },
     "campaigns": [
       {
@@ -236,7 +240,7 @@ module.exports = {
   },
   "cus_TOAHOHfXHuTdKU": {
     "name": "Rasheda Brown - The Q Spot",
-    "phone": "",
+    "phone": "+18036361744",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",
@@ -266,7 +270,7 @@ module.exports = {
   },
   "cus_U7hHnMbzDz5i47": {
     "name": "Donnell Charlton - A’leurer",
-    "phone": "",
+    "phone": "+13368987666",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",

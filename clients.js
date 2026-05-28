@@ -447,5 +447,35 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_UazMajLj8qQSS4": {
+    "name": "Lateasha R Dowdy - NuVibez Restaurant Bar & Lounge",
+    "phone": "+17184143302",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120243549648960513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 66.25,
+        "extendDays": 7,
+        "adsets": [
+          "120243549648950513",
+          "120245403604500513",
+          "120245404764820513",
+          "120245405537040513",
+          "120245405661280513"
+        ]
+      }
+    ]
   }
 };

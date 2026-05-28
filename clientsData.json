@@ -291,5 +291,26 @@
       ]
     }
   ]
+},
+"cus_UYiTtfiGvu6QQZ": {
+  "name": "Jay Lunsford - Snook's Grill & Cocktails",
+  "phone": "+14048032143",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120243163609100513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 66.25,
+      "extendDays": 7,
+      "adsets": [
+        "120243163609110513",
+        "120245065450610513",
+        "120245109036590513",
+        "120245109534720513",
+        "120245110074660513"
+      ]
+    }
+  ]
 }
 }

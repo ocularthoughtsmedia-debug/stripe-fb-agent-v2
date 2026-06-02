@@ -34,13 +34,26 @@
       "campaignIds": ["120208225851280513"]
     },
     "campaigns": [
-      {
-        "type": "adset",
-        "increase": 66.25,
-        "extendDays": 7,
-        "adsets": ["120215282436020513", "120208225851570513"]
-      }
+  {
+    "type": "adset",
+    "increase": 33.12,
+    "extendDays": 7,
+    "adsets": [
+      "120215282436020513",
+      "120208225851570513",
+      "120245727712890513",
+      "120245730741740513"
     ]
+  },
+  {
+    "type": "adset",
+    "increase": 132.50,
+    "extendDays": 7,
+    "adsets": [
+      "120245730908190513"
+    ]
+  }
+]
   },
   "cus_SDerLwePwWxkc5": {
   "name": "Boscoe's Babys",

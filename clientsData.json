@@ -347,5 +347,26 @@
       ]
     }
   ]
+},
+"cus_UeosLttSbyFLns": {
+  "name": "Darren Williams - Just Loaf'N (Atlanta, GA)",
+  "phone": "+17708751995",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120244038991620513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 66.25,
+      "extendDays": 7,
+      "adsets": [
+        "120244038991610513",
+        "120246302401460513",
+        "120246302822400513",
+        "120246303255890513",
+        "120246306208660513"
+      ]
+    }
+  ]
 }
 }

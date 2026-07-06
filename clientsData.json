@@ -203,19 +203,23 @@
   "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
   "analytics": { "level": "campaign", "campaignIds": ["120230216545690513"] },
   "campaigns": [
-    {
-      "type": "adset",
-      "increase": 66.25,
-      "extendDays": 7,
-      "adsets": [
-        "120230216545680513",
-        "120240613992930513",
-        "120240613999620513",
-        "120240614040600513",
-        "120240614078610513"
-      ]
-    }
-  ]
+  {
+    "type": "adset",
+    "increase": 331.25,
+    "extendDays": 7,
+    "adsets": [
+      "120247939557680513"
+    ]
+  },
+  {
+    "type": "adset",
+    "increase": 89.95,
+    "extendDays": 7,
+    "adsets": [
+      "120247405438940513"
+    ]
+  }
+]
 },
 
 "cus_U5X1Z3nkAEqTBK": {

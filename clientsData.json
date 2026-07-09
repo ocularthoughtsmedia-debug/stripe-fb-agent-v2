@@ -179,19 +179,15 @@
   "phone": "+18036361744",
   "timezone": "America/New_York",
   "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
-  "analytics": { "level": "campaign", "campaignIds": ["120239505668610513"] },
+  "analytics": { "level": "campaign", "campaignIds": ["120248025671090513"] },
   "campaigns": [
     {
       "type": "adset",
-      "increase": 66.25,
+      "increase": 331.25,
       "extendDays": 7,
       "adsets": [
-  "120239505668580513",
-  "120239582103300513",
-  "120242614023720513",
-  "120242616143910513",
-  "120242616769590513"
-]
+        "120248025671070513"
+      ]
     }
   ]
 },

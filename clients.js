@@ -108,17 +108,7 @@ module.exports = {
         "120227144383820513"
       ]
     },
-    "campaigns": [
-      {
-        "type": "adset",
-        "increase": 66.25,
-        "extendDays": 7,
-        "adsets": [
-          "120227144383810513",
-          "120231017436880513"
-        ]
-      }
-    ]
+    "campaigns": []
   },
   "cus_TEyLO2B2ut8Mcx": {
     "name": "Spill The Beans",

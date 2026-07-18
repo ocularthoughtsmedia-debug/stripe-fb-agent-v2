@@ -357,5 +357,23 @@
       ]
     }
   ]
+},
+"cus_UooNeNv2FAdPVP": {
+  "name": "Andrew Loyd - Loyd Have Mercy (Titusville, FL)",
+  "phone": "+13213034949",
+  "email": "Loydhavemercy@gmail.com",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120248294822170513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 331.25,
+      "extendDays": 7,
+      "adsets": [
+        "120248294822190513"
+      ]
+    }
+  ]
 }
 }

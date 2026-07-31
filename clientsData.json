@@ -393,5 +393,23 @@
       ]
     }
   ]
+},
+"cus_UzIo3HQPdkFvAz": {
+  "name": "Sabina Jules - Motherlands African Kitchen (Hagerstown, MD)",
+  "phone": "+17704027077",
+  "email": "antiley@yahoo.com",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120248605636700513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 331.25,
+      "extendDays": 7,
+      "adsets": [
+        "120248605636690513"
+      ]
+    }
+  ]
 }
 }

@@ -530,5 +530,32 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_UzHGZ6anmWxg3b": {
+    "name": "Will Owens - Dat Bayou Spot Cafe (Cedar Hill, TX)",
+    "phone": "+12145987164",
+    "email": "will@datbayouspot.net",
+    "timezone": "America/Chicago",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120248605412750513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 331.25,
+        "extendDays": 7,
+        "adsets": [
+          "120248605412740513"
+        ]
+      }
+    ]
   }
 };

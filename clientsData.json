@@ -411,5 +411,23 @@
       ]
     }
   ]
+},
+"cus_V0PQK5gpw73pPm": {
+  "name": "Gloria Matlock - Ida Mae's Soul Food (Waxahachie, TX)",
+  "phone": "+12146838797",
+  "email": "gigimatlock72@gmail.com",
+  "timezone": "America/Chicago",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120247917803850513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 331.25,
+      "extendDays": 7,
+      "adsets": [
+        "120247917803840513"
+      ]
+    }
+  ]
 }
 }

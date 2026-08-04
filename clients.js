@@ -638,5 +638,32 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_V0UgbGQDEd0Lc3": {
+    "name": "Natalie Brannon - Brannon's Kitchen (Lithonia, GA)",
+    "phone": "+16787327365",
+    "email": "brannonteam2@gmail.com",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120247916771400513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 331.25,
+        "extendDays": 7,
+        "adsets": [
+          "120247916771420513"
+        ]
+      }
+    ]
   }
 };

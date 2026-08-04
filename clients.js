@@ -611,5 +611,32 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_V0Vh7ZgBJa7ajo": {
+    "name": "Netasha Reed - Flavaz Reserve (Fort Worth, TX)",
+    "phone": "+16825619847",
+    "email": "admin@flavazreserve.com",
+    "timezone": "America/Chicago",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120247913823510513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 331.25,
+        "extendDays": 7,
+        "adsets": [
+          "120247913823490513"
+        ]
+      }
+    ]
   }
 };

@@ -96,6 +96,7 @@ module.exports = {
   "cus_StFbuW9XQ1IERH": {
     "name": "Scoops & Subs",
     "phone": "+13862351470",
+    "email": "arahwilliams9@gmail.com",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",
@@ -105,10 +106,19 @@ module.exports = {
     "analytics": {
       "level": "campaign",
       "campaignIds": [
-        "120227144383820513"
+        "120248045251530513"
       ]
     },
-    "campaigns": []
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 132.5,
+        "extendDays": 7,
+        "adsets": [
+          "120248052013580513"
+        ]
+      }
+    ]
   },
   "cus_TEyLO2B2ut8Mcx": {
     "name": "Spill The Beans",

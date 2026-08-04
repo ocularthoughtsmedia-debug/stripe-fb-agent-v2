@@ -75,10 +75,20 @@
 "cus_StFbuW9XQ1IERH": {
   "name": "Scoops & Subs",
   "phone": "+13862351470",
+  "email": "arahwilliams9@gmail.com",
   "timezone": "America/New_York",
   "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
-  "analytics": { "level": "campaign", "campaignIds": ["120227144383820513"] },
-  "campaigns": []
+  "analytics": { "level": "campaign", "campaignIds": ["120248045251530513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 132.50,
+      "extendDays": 7,
+      "adsets": [
+        "120248052013580513"
+      ]
+    }
+  ]
 },
 
 "cus_TEyLO2B2ut8Mcx": {

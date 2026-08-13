@@ -24,6 +24,10 @@ const { startReportRunner } = require("./reportRunner");
 startReportRunner();
 
 
+// ✅ Read-only clients config endpoint
+const clientsConfigRoute = require("./clientsConfigRoute");
+app.use("/clients-config", clientsConfigRoute);
+
 // ✅ Health check
 app.get("/", (req, res) => res.send("OK"));
 

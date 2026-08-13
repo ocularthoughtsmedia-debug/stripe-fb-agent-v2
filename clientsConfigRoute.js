@@ -31,11 +31,9 @@ router.get("/", requireApiKey, async (req, res) => {
     const data = JSON.parse(raw); // parse so malformed JSON is a 500, not a broken body
     return res.status(200).json(data);
   } catch (e) {
+    // Full cause stays in the server logs only — not echoed to the caller.
     console.error("❌ /clients-config read error:", e.message);
-    return res.status(500).json({
-      error: "Could not read clientsData.json",
-      detail: e.message,
-    });
+    return res.status(500).json({ error: "Could not read clientsData.json" });
   }
 });
 

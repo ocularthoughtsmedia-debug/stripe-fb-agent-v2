@@ -665,5 +665,32 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_V5cihIPgPDgIc2": {
+    "name": "Adenike Adojtelegan - Africaboro (Statesboro, GA)",
+    "phone": "+19127238538",
+    "email": "ibileusa@gmail.com",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "monthly",
+      "paymentsPerCycle": 1,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120249063534120513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 265,
+        "extendDays": 30,
+        "adsets": [
+          "120249063534130513"
+        ]
+      }
+    ]
   }
 };

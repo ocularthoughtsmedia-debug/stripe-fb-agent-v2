@@ -46,7 +46,7 @@ module.exports = {
     "campaigns": [
       {
         "type": "adset",
-        "increase": 132.5,
+        "increase": 331.25,
         "extendDays": 7,
         "adsets": [
           "120248818019990513",

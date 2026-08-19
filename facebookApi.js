@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { DateTime } = require('luxon');
+const adSpendLog = require('./adSpendLog');
 
 async function updateCampaign(amount) {
   const campaignId = process.env.FB_CAMPAIGN_ID;
@@ -28,39 +29,268 @@ async function updateCampaign(amount) {
 }
 
 module.exports = updateCampaign;
+// After this many failed attempts on the same invoice+object, stop asking Stripe
+// to redeliver. Stripe disables endpoints that fail persistently, so an
+// unbounded retry loop costs more than the missed increase.
+const MAX_FAILED_ATTEMPTS = 3;
+
+// Turn whatever Facebook/axios threw into something a TEXT column can hold.
+function describeFbError(err) {
+    const detail = err?.response?.data || err?.message || String(err);
+    if (typeof detail === 'string') return detail;
+    try {
+        return JSON.stringify(detail);
+    } catch (_) {
+        return String(err?.message || err);
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// The retry guard.
+//
+// A Facebook budget increase is ADDITIVE and Facebook offers no idempotency
+// key, so re-running one silently funds the client twice. When Stripe
+// redelivers a webhook — which it does whenever we answer non-2xx — this is
+// what decides, per Facebook object, whether the increase still needs sending.
+//
+// It runs AFTER the budget read, so `currentBudgetCents` is Facebook's own
+// current value. That is the trick that closes the worst window: if our POST
+// committed but the response was lost, we recorded 'failed' while Facebook
+// actually applied it. Comparing Facebook's live budget against the target we
+// recorded tells us which of the two happened, instead of guessing.
+// ═══════════════════════════════════════════════════════════════
+async function resolvePriorAttempt(context, fbObjectId, currentBudgetCents) {
+    // No payment context: nothing to dedupe against (a manual/legacy call).
+    if (!context || !context.stripeInvoiceId) {
+        return { action: 'proceed', ledgerAvailable: adSpendLog.isConfigured() };
+    }
+
+    const history = await adSpendLog.getObjectHistory(context.stripeInvoiceId, fbObjectId);
+
+    // Ledger unreachable. Proceed — a database outage must not starve a paying
+    // client's ads — but report it, because the caller must NOT then ask Stripe
+    // to retry: without the ledger a redelivery could double-fund.
+    if (!history) {
+        return { action: 'proceed', ledgerAvailable: false, blind: true };
+    }
+
+    // 1. Already funded by this invoice. The whole point of the exercise.
+    if (history.hasApplied) {
+        return {
+            action: 'skip',
+            ledgerAvailable: true,
+            reason: `already applied for invoice ${context.stripeInvoiceId}`,
+        };
+    }
+
+    // 2. Previously flagged for a human. Sticky on purpose: the flag means we
+    //    could not tell whether money had moved, and a later delivery is no
+    //    better informed than the one that raised it.
+    if (history.hasNeedsReview) {
+        return {
+            action: 'needs_review',
+            ledgerAvailable: true,
+            reason: 'previously flagged for review; not retrying automatically',
+        };
+    }
+
+    const latest = history.latest;
+    if (!latest) return { action: 'proceed', ledgerAvailable: true }; // never attempted
+
+    const failedWithTarget = latest.status === 'failed' && latest.newBudgetCents !== null;
+
+    // 3. The lost-response case: Facebook's budget already equals the target we
+    //    recorded, so the POST we logged as failed did in fact land.
+    if (failedWithTarget && currentBudgetCents === latest.newBudgetCents) {
+        return {
+            action: 'reconcile',
+            ledgerAvailable: true,
+            previousBudgetCents: latest.previousBudgetCents,
+            newBudgetCents: latest.newBudgetCents,
+            reason:
+                `reconciled: Facebook's budget is already ${latest.newBudgetCents} cents, ` +
+                `so the attempt recorded as failed had actually been applied`,
+        };
+    }
+
+    // 4. Enough. Hand it to a human rather than loop.
+    if (history.failedCount >= MAX_FAILED_ATTEMPTS) {
+        return {
+            action: 'needs_review',
+            ledgerAvailable: true,
+            reason: `${history.failedCount} failed attempts for this invoice; not retrying automatically`,
+        };
+    }
+
+    // 5. Budget is untouched at the value we read last time — the write did not
+    //    land, so sending it now is correct and cannot double-fund.
+    if (failedWithTarget && currentBudgetCents === latest.previousBudgetCents) {
+        return { action: 'proceed', ledgerAvailable: true };
+    }
+
+    // 6. The budget is at neither value: someone edited it in Ads Manager
+    //    between the attempts. We cannot tell whether our increase is in there,
+    //    and guessing risks funding twice, so stop and flag it.
+    if (failedWithTarget) {
+        return {
+            action: 'needs_review',
+            ledgerAvailable: true,
+            reason:
+                `budget is ${currentBudgetCents} cents but the previous attempt expected ` +
+                `${latest.previousBudgetCents} (not applied) or ${latest.newBudgetCents} (applied) — ` +
+                `it was changed elsewhere, so we cannot tell whether this increase already landed`,
+        };
+    }
+
+    // 7. The previous attempt failed before it wrote anything (the read itself
+    //    failed), so there is nothing to reconcile and a retry is unambiguous.
+    return { action: 'proceed', ledgerAvailable: true };
+}
+
 // 🔥 Update AdSet Budget by ADDING to the current budget
-async function updateAdSetBudget(adsetId, increaseAmount) {
+//
+// `context` carries the Stripe payment that caused this allocation
+// ({ stripeCustomerId, stripeInvoiceId, clientName, campaignType }) so the
+// increase can be recorded permanently. Optional: without it the update still
+// runs exactly as before and adSpendLog declines to write an unattributable row.
+async function updateAdSetBudget(adsetId, increaseAmount, context = null) {
     const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
 
     // 1️⃣ Get current ad set info first
     const readUrl = `https://graph.facebook.com/v19.0/${adsetId}?fields=lifetime_budget&access_token=${accessToken}`;
     const updateUrl = `https://graph.facebook.com/v19.0/${adsetId}`;
 
+    // Integer cents end to end. Facebook's Graph API speaks minor units and the
+    // dashboard sums in cents, so a trip through floating-point dollars would
+    // only introduce rounding that nothing needs.
+    const increaseCents = Math.round(Number(increaseAmount) * 100);
+
+    // Declared out here so the failure path can record how far we got: both set
+    // means the POST was attempted and its outcome is genuinely unknown; both
+    // null means nothing was written and a retry is unambiguously safe.
+    let currentBudgetCents = null;
+    let newBudgetCents = null;
+
+    // Tracked out here so the throw path can tell the caller whether the ledger
+    // was readable. If it wasn't, the caller must not ask Stripe to redeliver.
+    let ledgerAvailable = adSpendLog.isConfigured();
+
+    const logAllocation = (status, extra) =>
+        adSpendLog.recordAllocation({
+            ...(context || {}),
+            fbObjectType: 'adset',
+            fbObjectId: adsetId,
+            allocatedDollars: increaseAmount,
+            previousBudgetCents: currentBudgetCents,
+            newBudgetCents,
+            status,
+            ...extra,
+        });
+
     try {
+        // A misconfigured `increase` is permanent, not transient: retrying it
+        // forever would just hammer Stripe's endpoint, so it is review-worthy
+        // rather than retryable.
+        if (!Number.isFinite(increaseCents) || increaseCents < 0) {
+            const reason = `increase amount is not a usable number (${JSON.stringify(increaseAmount)})`;
+            console.error(`❌ Ad set ${adsetId}: ${reason}`);
+            await logAllocation('needs_review', { error: reason });
+            return { ok: false, status: 'needs_review', fbObjectType: 'adset', fbObjectId: adsetId, reason };
+        }
+
         console.log(`📘 Fetching current budget for ad set ${adsetId}...`);
 
         const readResponse = await axios.get(readUrl);
-        const currentBudget = Number(readResponse.data.lifetime_budget);
+        currentBudgetCents = Number(readResponse.data.lifetime_budget);
 
-        console.log(`💰 Current budget: $${currentBudget / 100}`);
+        // Facebook omits lifetime_budget entirely for a daily-budget ad set, so
+        // this used to be Number(undefined) -> NaN, which was then added to and
+        // POSTed as the new budget. Refuse to write rather than send garbage.
+        // Also permanent, so also review rather than retry.
+        if (!Number.isFinite(currentBudgetCents) || currentBudgetCents <= 0) {
+            const seen = JSON.stringify(readResponse.data?.lifetime_budget);
+            currentBudgetCents = null;
+            const reason = `no usable lifetime_budget (${seen}) — refusing to write a budget`;
+            console.error(`❌ Ad set ${adsetId}: ${reason}`);
+            await logAllocation('needs_review', { error: reason });
+            return { ok: false, status: 'needs_review', fbObjectType: 'adset', fbObjectId: adsetId, reason };
+        }
+
+        console.log(`💰 Current budget: $${currentBudgetCents / 100}`);
+
+        // ── The retry guard, between the read and the write ──
+        const prior = await resolvePriorAttempt(context, adsetId, currentBudgetCents);
+        ledgerAvailable = prior.ledgerAvailable;
+
+        if (prior.action === 'skip') {
+            console.log(`⏭️ Ad set ${adsetId}: ${prior.reason} — skipping to avoid double-funding.`);
+            return {
+                ok: true, status: 'skipped', fbObjectType: 'adset', fbObjectId: adsetId,
+                ledgerAvailable: prior.ledgerAvailable, reason: prior.reason,
+            };
+        }
+
+        if (prior.action === 'needs_review') {
+            console.error(`🛑 Ad set ${adsetId}: ${prior.reason}`);
+            newBudgetCents = null;
+            await logAllocation('needs_review', { error: prior.reason });
+            return {
+                ok: false, status: 'needs_review', fbObjectType: 'adset', fbObjectId: adsetId,
+                ledgerAvailable: prior.ledgerAvailable, reason: prior.reason,
+            };
+        }
+
+        if (prior.action === 'reconcile') {
+            console.log(`🧾 Ad set ${adsetId}: ${prior.reason} — recording it as applied, not sending again.`);
+            currentBudgetCents = prior.previousBudgetCents;
+            newBudgetCents = prior.newBudgetCents;
+            await logAllocation('applied', { error: prior.reason });
+            return {
+                ok: true, status: 'reconciled', fbObjectType: 'adset', fbObjectId: adsetId,
+                ledgerAvailable: prior.ledgerAvailable,
+                previousBudgetCents: currentBudgetCents, newBudgetCents,
+            };
+        }
 
         // 2️⃣ Add weekly increase to the current budget
-        const newBudget = currentBudget + Math.round(increaseAmount * 100);
+        newBudgetCents = currentBudgetCents + increaseCents;
 
-        console.log(`🆕 New budget will be: $${newBudget / 100}`);
+        console.log(`🆕 New budget will be: $${newBudgetCents / 100}`);
 
         // 3️⃣ Send update to Facebook
         const updateResponse = await axios.post(updateUrl, null, {
             params: {
                 access_token: accessToken,
-                lifetime_budget: newBudget
+                lifetime_budget: newBudgetCents
             }
         });
 
-        console.log(`✔️ Updated ad set ${adsetId} to new budget: $${newBudget / 100}`, updateResponse.data);
+        console.log(`✔️ Updated ad set ${adsetId} to new budget: $${newBudgetCents / 100}`, updateResponse.data);
+
+        await logAllocation('applied', { rawResponse: updateResponse.data });
+
+        return {
+            ok: true,
+            status: 'applied',
+            fbObjectType: 'adset',
+            fbObjectId: adsetId,
+            allocatedDollars: increaseAmount,
+            previousBudgetCents: currentBudgetCents,
+            newBudgetCents,
+            ledgerAvailable: prior.ledgerAvailable,
+        };
 
     } catch (err) {
         console.error(`❌ Error updating budget for ad set ${adsetId}:`, err.response?.data || err.message);
+        // Recorded BEFORE the rethrow, and with whatever budget figures we had
+        // reached: a POST-stage failure carries previous+new, which is what lets
+        // the next delivery reconcile it against Facebook's live budget.
+        await logAllocation('failed', {
+            error: describeFbError(err),
+            rawResponse: err?.response?.data || null,
+        });
+        err.ledgerAvailable = ledgerAvailable;
+        err.fbObjectId = adsetId;
         throw err;
     }
 }
@@ -97,10 +327,38 @@ async function extendAdSetEndDate(adsetId, daysToAdd) {
 }
 
 // ⭐ Update Campaign Budget (Lifetime Budget Addition)
-async function updateCampaignBudget(campaignId, increaseAmount) {
+//
+// `context` is the causing Stripe payment — see updateAdSetBudget.
+async function updateCampaignBudget(campaignId, increaseAmount, context = null) {
     const accessToken = process.env.FB_PAGE_ACCESS_TOKEN;
 
+    const increaseCents = Math.round(Number(increaseAmount) * 100);
+
+    let currentBudgetCents = null;
+    let newBudgetCents = null;
+    let ledgerAvailable = adSpendLog.isConfigured();
+
+    const logAllocation = (status, extra) =>
+        adSpendLog.recordAllocation({
+            ...(context || {}),
+            fbObjectType: 'campaign',
+            fbObjectId: campaignId,
+            allocatedDollars: increaseAmount,
+            previousBudgetCents: currentBudgetCents,
+            newBudgetCents,
+            status,
+            ...extra,
+        });
+
     try {
+        // Permanent misconfiguration — review, don't retry. See updateAdSetBudget.
+        if (!Number.isFinite(increaseCents) || increaseCents < 0) {
+            const reason = `increase amount is not a usable number (${JSON.stringify(increaseAmount)})`;
+            console.error(`❌ Campaign ${campaignId}: ${reason}`);
+            await logAllocation('needs_review', { error: reason });
+            return { ok: false, status: 'needs_review', fbObjectType: 'campaign', fbObjectId: campaignId, reason };
+        }
+
         console.log(`🔍 Fetching current budget for campaign ${campaignId}...`);
 
         // STEP 1 — Get existing budget
@@ -113,16 +371,61 @@ async function updateCampaignBudget(campaignId, increaseAmount) {
             }
         });
 
-        const currentBudgetCents = getResponse.data.lifetime_budget;
-        const currentBudget = currentBudgetCents / 100;
+        // Facebook returns this as a STRING of minor units; Number() makes the
+        // arithmetic explicit instead of relying on string coercion.
+        currentBudgetCents = Number(getResponse.data.lifetime_budget);
 
-        console.log(`💰 Current campaign budget: $${currentBudget}`);
+        if (!Number.isFinite(currentBudgetCents) || currentBudgetCents <= 0) {
+            const seen = JSON.stringify(getResponse.data?.lifetime_budget);
+            currentBudgetCents = null;
+            const reason = `no usable lifetime_budget (${seen}) — refusing to write a budget`;
+            console.error(`❌ Campaign ${campaignId}: ${reason}`);
+            await logAllocation('needs_review', { error: reason });
+            return { ok: false, status: 'needs_review', fbObjectType: 'campaign', fbObjectId: campaignId, reason };
+        }
 
-        // STEP 2 — Add increaseAmount
-        const newBudget = currentBudget + increaseAmount;
-        const newBudgetCents = Math.round(newBudget * 100);
+        console.log(`💰 Current campaign budget: $${currentBudgetCents / 100}`);
 
-        console.log(`⬆️ New campaign budget will be: $${newBudget}`);
+        // ── The retry guard, between the read and the write ──
+        const prior = await resolvePriorAttempt(context, campaignId, currentBudgetCents);
+        ledgerAvailable = prior.ledgerAvailable;
+
+        if (prior.action === 'skip') {
+            console.log(`⏭️ Campaign ${campaignId}: ${prior.reason} — skipping to avoid double-funding.`);
+            return {
+                ok: true, status: 'skipped', fbObjectType: 'campaign', fbObjectId: campaignId,
+                ledgerAvailable: prior.ledgerAvailable, reason: prior.reason,
+            };
+        }
+
+        if (prior.action === 'needs_review') {
+            console.error(`🛑 Campaign ${campaignId}: ${prior.reason}`);
+            newBudgetCents = null;
+            await logAllocation('needs_review', { error: prior.reason });
+            return {
+                ok: false, status: 'needs_review', fbObjectType: 'campaign', fbObjectId: campaignId,
+                ledgerAvailable: prior.ledgerAvailable, reason: prior.reason,
+            };
+        }
+
+        if (prior.action === 'reconcile') {
+            console.log(`🧾 Campaign ${campaignId}: ${prior.reason} — recording it as applied, not sending again.`);
+            currentBudgetCents = prior.previousBudgetCents;
+            newBudgetCents = prior.newBudgetCents;
+            await logAllocation('applied', { error: prior.reason });
+            return {
+                ok: true, status: 'reconciled', fbObjectType: 'campaign', fbObjectId: campaignId,
+                ledgerAvailable: prior.ledgerAvailable,
+                previousBudgetCents: currentBudgetCents, newBudgetCents,
+            };
+        }
+
+        // STEP 2 — Add increaseAmount, in cents. Previously this converted to
+        // dollars, added, then re-rounded; staying in integers removes the
+        // float round-trip without changing the result.
+        newBudgetCents = currentBudgetCents + increaseCents;
+
+        console.log(`⬆️ New campaign budget will be: $${newBudgetCents / 100}`);
 
         // STEP 3 — Update the campaign budget
         const updateResponse = await axios({
@@ -134,10 +437,29 @@ async function updateCampaignBudget(campaignId, increaseAmount) {
             }
         });
 
-        console.log(`✅ Campaign budget updated to $${newBudget}`, updateResponse.data);
+        console.log(`✅ Campaign budget updated to $${newBudgetCents / 100}`, updateResponse.data);
+
+        await logAllocation('applied', { rawResponse: updateResponse.data });
+
+        return {
+            ok: true,
+            status: 'applied',
+            fbObjectType: 'campaign',
+            fbObjectId: campaignId,
+            allocatedDollars: increaseAmount,
+            previousBudgetCents: currentBudgetCents,
+            newBudgetCents,
+            ledgerAvailable: prior.ledgerAvailable,
+        };
 
     } catch (err) {
         console.error(`❌ Error updating campaign budget:`, err.response?.data || err.message);
+        await logAllocation('failed', {
+            error: describeFbError(err),
+            rawResponse: err?.response?.data || null,
+        });
+        err.ledgerAvailable = ledgerAvailable;
+        err.fbObjectId = campaignId;
         throw err;
     }
 }
@@ -442,40 +764,120 @@ async function handleQSpotUpdate() {
 }
 
 // ⭐ Generic handler for clients defined in clients.js
-async function handleRegistryClientUpdate(clientConfig) {
+//
+// `paymentContext` identifies the Stripe payment that triggered this update
+// ({ stripeCustomerId, stripeInvoiceId, clientName }) and is what makes each
+// budget increase permanently attributable. Optional — omitted, the updates run
+// exactly as before and simply aren't recorded.
+async function handleRegistryClientUpdate(clientConfig, paymentContext = null) {
   console.log(`🤖 Auto handler: updating client ${clientConfig.name}`);
+
+  // campaignType is filled in per entry below so a stored allocation can be
+  // reconciled against the clientsData.json rule that produced it.
+  const ctx = paymentContext
+    ? { clientName: clientConfig.name, ...paymentContext }
+    : null;
+  const withType = (type) => (ctx ? { ...ctx, campaignType: type } : null);
+
+  const summary = {
+    applied: 0,      // increase sent to Facebook and recorded
+    skipped: 0,      // already funded by this invoice (guard fired), or reconciled
+    retryable: 0,    // failed in a way a redelivery could fix
+    needsReview: 0,  // failed in a way a redelivery could NOT fix
+    endDateFailures: 0,
+    // False if ANY object could not consult the ledger. The caller uses this to
+    // decide whether asking Stripe to redeliver is safe.
+    ledgerAvailable: adSpendLog.isConfigured(),
+    results: [],
+  };
+
+  // ── Every budget write goes through here ──
+  // The loop must NOT abort on one failure. Previously a single bad adset threw
+  // and starved every adset after it, so a transient blip on the first of three
+  // meant the other two never got funded at all.
+  const runBudget = async (fn, objectId, increase, type) => {
+    try {
+      const outcome = await fn(objectId, increase, withType(type));
+      if (outcome.ledgerAvailable === false) summary.ledgerAvailable = false;
+
+      if (outcome.status === "applied") summary.applied++;
+      else if (outcome.status === "skipped" || outcome.status === "reconciled") summary.skipped++;
+      else if (outcome.status === "needs_review") summary.needsReview++;
+
+      summary.results.push(outcome);
+    } catch (err) {
+      // A Facebook or network error: either the increase did not land, or we
+      // cannot prove it did. Retryable — and safe to retry, because the next
+      // delivery re-runs the guard against the row just written.
+      if (err.ledgerAvailable === false) summary.ledgerAvailable = false;
+      summary.retryable++;
+      summary.results.push({
+        ok: false,
+        status: "failed",
+        fbObjectType: type === "campaign" ? "campaign" : "adset",
+        fbObjectId: objectId,
+        error: describeFbError(err),
+      });
+      console.error(
+        `❌ Budget update failed for ${objectId} — continuing with the rest of ${clientConfig.name}: ${err.message}`
+      );
+    }
+  };
+
+  // End-date extensions need no dedupe: extendAdSetEndDate sets end_time to
+  // now + N days ABSOLUTELY, not additively, so re-running one is harmless.
+  // A failure is therefore always safely retryable.
+  const runEndDate = async (adsetId, days) => {
+    try {
+      await extendAdSetEndDate(adsetId, days);
+    } catch (err) {
+      summary.retryable++;
+      summary.endDateFailures++;
+      console.error(
+        `❌ End-date extension failed for ${adsetId} — continuing with the rest of ${clientConfig.name}: ${err.message}`
+      );
+    }
+  };
 
   for (const campaign of clientConfig.campaigns) {
     if (campaign.type === "adset") {
-  // Adset-level budgets + end dates
-  for (const adsetId of campaign.adsets) {
-    await updateAdSetBudget(adsetId, campaign.increase);
-    await extendAdSetEndDate(adsetId, campaign.extendDays);
-  }
+      // Adset-level budgets + end dates
+      for (const adsetId of campaign.adsets) {
+        await runBudget(updateAdSetBudget, adsetId, campaign.increase, "adset");
+        await runEndDate(adsetId, campaign.extendDays);
+      }
 
-} else if (campaign.type === "enddate_only") {
-  // ✅ End date only (daily budgets — do NOT change budget)
-  for (const adsetId of campaign.adsets) {
-    await extendAdSetEndDate(adsetId, campaign.extendDays);
-  }
+    } else if (campaign.type === "enddate_only") {
+      // ✅ End date only (daily budgets — do NOT change budget)
+      // No allocation row: nothing is funded here, and a $0 row would dilute the
+      // ledger's meaning. This matches weeklyAdSpendCents, which also skips it.
+      for (const adsetId of campaign.adsets) {
+        await runEndDate(adsetId, campaign.extendDays);
+      }
 
-} else if (campaign.type === "campaign") {
-  // Campaign-level budget + (optional) adset end dates
-  await updateCampaignBudget(campaign.campaignId, campaign.increase);
+    } else if (campaign.type === "campaign") {
+      // Campaign-level budget + (optional) adset end dates
+      await runBudget(updateCampaignBudget, campaign.campaignId, campaign.increase, "campaign");
 
-  if (campaign.adsets?.length) {
-    for (const adsetId of campaign.adsets) {
-      await extendAdSetEndDate(adsetId, campaign.extendDays);
+      if (campaign.adsets?.length) {
+        for (const adsetId of campaign.adsets) {
+          await runEndDate(adsetId, campaign.extendDays);
+        }
+      }
+
+    } else {
+      console.log(`⚠️ Unknown campaign type "${campaign.type}" for client ${clientConfig.name} – skipping`);
     }
   }
 
-} else {
-  console.log(`⚠️ Unknown campaign type "${campaign.type}" for client ${clientConfig.name} – skipping`);
-}
+  console.log(
+    `✅ Auto handler finished for ${clientConfig.name} — ` +
+      `applied ${summary.applied}, skipped ${summary.skipped}, ` +
+      `retryable ${summary.retryable}, needs review ${summary.needsReview}` +
+      (summary.ledgerAvailable ? "" : " (LEDGER UNAVAILABLE)")
+  );
 
-  }
-
-  console.log(`✅ Auto handler finished for ${clientConfig.name}`);
+  return summary;
 }
 // Pull last 30 days campaign-level metrics
 async function getCampaign30DayInsights(campaignId) {
@@ -530,6 +932,11 @@ module.exports = {
     handleMiddletonsMortuaryUpdate,
     handleQSpotUpdate,
     updateAdSetBudget,
+    // The `module.exports.updateCampaignBudget = …` line further up is wiped by
+    // this wholesale assignment, so it has to be listed here to be reachable at
+    // all. Internal callers were unaffected (they use the local binding), which
+    // is why nothing broke.
+    updateCampaignBudget,
     extendAdSetEndDate,
     handleRegistryClientUpdate,
     getCampaign30DayInsights,

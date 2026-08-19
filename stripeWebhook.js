@@ -71,7 +71,14 @@ router.post("/", async (req, res) => {
       return res.status(200).json({ received: true });
     }
 
-    // idempotency guard (prevents processing same invoice twice)
+    // ── Idempotency, fast path ──
+    // lastInvoiceIdProcessed now means "the Facebook work for this invoice
+    // COMPLETED", and is written only after that is true (see below).
+    //
+    // Advisory only. reports.json lives on Render's ephemeral filesystem AND is
+    // committed to git, so every deploy resets it — this guard cannot be
+    // trusted as the sole defence. The authoritative, deploy-proof guard is the
+    // ad_spend_allocations ledger, enforced per Facebook object.
     const state = getClientReportState(customerId);
     if (state.lastInvoiceIdProcessed === invoice.id) {
       console.log(`🟡 Duplicate invoice ignored for ${client.name}: ${invoice.id}`);
@@ -83,36 +90,78 @@ router.post("/", async (req, res) => {
     // stop reminders for this invoice
     markPaid({ invoiceId: invoice.id });
 
-   // cycle/report tracking (TRUE 30-day schedule)
-const billing = client.billing || { reportDelayDays: 2 };
+    // ── Non-Facebook bookkeeping runs NOW ──
+    // All of it is safe to repeat if Stripe redelivers: the cycle clock is
+    // set-once, lastPaymentAt is just a refresh, and markPaid is idempotent.
+    // None of it spends money, so none of it needs to wait for Facebook.
+    const billing = client.billing || { reportDelayDays: 2 };
 
-// Start cycle clock on first successful payment
-if (!state.cycleStartAt) {
-  state.cycleStartAt = Date.now();
+    // Start cycle clock on first successful payment
+    if (!state.cycleStartAt) {
+      state.cycleStartAt = Date.now();
 
-  // schedule report for 30 days + delayDays after cycle start
-  const delayDays = Number(billing.reportDelayDays || 0);
-  state.reportScheduledAt =
-    state.cycleStartAt + (30 + delayDays) * 24 * 60 * 60 * 1000;
+      // schedule report for 30 days + delayDays after cycle start
+      const delayDays = Number(billing.reportDelayDays || 0);
+      state.reportScheduledAt =
+        state.cycleStartAt + (30 + delayDays) * 24 * 60 * 60 * 1000;
 
-  console.log(
-    `📌 Scheduled 30-day report for ${client.name} at ${new Date(state.reportScheduledAt).toISOString()}`
-  );
-}
+      console.log(
+        `📌 Scheduled 30-day report for ${client.name} at ${new Date(state.reportScheduledAt).toISOString()}`
+      );
+    }
 
-// always track latest successful payment
-state.lastPaymentAt = Date.now();
+    // always track latest successful payment
+    state.lastPaymentAt = Date.now();
 
-// keep your idempotency fields
-state.lastInvoiceIdProcessed = invoice.id;
-state.lastInvoiceProcessedAt = Date.now();
-
-setClientReportState(customerId, state);
+    // "We have seen this invoice", which is NOT the same fact as "we have
+    // finished funding it". Keeping them separate is the whole fix.
+    state.lastInvoiceSeenAt = Date.now();
 
     setClientReportState(customerId, state);
 
     // ✅ the ONLY FB update path
-    await handleRegistryClientUpdate(client);
+    // Each budget increase is recorded permanently in ad_spend_allocations, and
+    // that ledger is what makes the redelivery below safe: an object already
+    // funded by this invoice is skipped rather than funded twice.
+    const result = await handleRegistryClientUpdate(client, {
+      stripeCustomerId: customerId,
+      stripeInvoiceId: invoice.id,
+    });
+
+    // ── Ask Stripe to redeliver, but only when a redelivery is both useful
+    //    and safe ──
+    // Useful: at least one failure a retry could actually fix.
+    // Safe: the ledger was readable, so the retry can tell what already landed.
+    // Without the ledger we deliberately answer 200 and accept an under-funded
+    // client over risking a double-funded one — a Facebook increase is additive
+    // and cannot be taken back.
+    if (result.retryable > 0 && result.ledgerAvailable) {
+      console.error(
+        `🔁 ${client.name}: ${result.retryable} budget update(s) failed for invoice ${invoice.id} — ` +
+          `returning 500 so Stripe redelivers. Already-applied increases will be skipped.`
+      );
+      return res.status(500).json({ error: "ad budget update incomplete" });
+    }
+
+    if (result.retryable > 0) {
+      console.error(
+        `🚨 ${client.name}: ${result.retryable} budget update(s) failed for invoice ${invoice.id}, ` +
+          `but the allocation ledger was UNREACHABLE. Answering 200 to suppress Stripe's retry, ` +
+          `because without the ledger a redelivery could double-fund. Needs a manual check.`
+      );
+    }
+
+    if (result.needsReview > 0) {
+      console.error(
+        `🛑 ${client.name}: ${result.needsReview} allocation(s) for invoice ${invoice.id} need review — ` +
+          `a retry cannot resolve these. See ad_spend_allocations WHERE status = 'needs_review'.`
+      );
+    }
+
+    // Facebook work is done (or is not retryable): NOW record completion.
+    state.lastInvoiceIdProcessed = invoice.id;
+    state.lastInvoiceProcessedAt = Date.now();
+    setClientReportState(customerId, state);
 
     return res.status(200).json({ received: true });
   }

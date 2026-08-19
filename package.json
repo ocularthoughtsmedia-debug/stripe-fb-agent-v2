@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/allocation-guard.test.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "luxon": "^3.7.2",
+    "pg": "^8.23.0",
     "stripe": "^19.1.0",
     "twilio": "^5.10.3"
   }

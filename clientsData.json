@@ -187,7 +187,7 @@
   "phone": "+13368987666",
   "timezone": "America/New_York",
   "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
-  "analytics": { "level": "campaign", "campaignIds": ["120230216545690513"] },
+  "analytics": { "level": "campaign", "campaignIds": [] },
   "campaigns": [
   {
     "type": "adset",

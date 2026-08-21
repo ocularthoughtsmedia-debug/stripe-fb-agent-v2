@@ -275,9 +275,7 @@ module.exports = {
     },
     "analytics": {
       "level": "campaign",
-      "campaignIds": [
-        "120230216545690513"
-      ]
+      "campaignIds": []
     },
     "campaigns": [
       {

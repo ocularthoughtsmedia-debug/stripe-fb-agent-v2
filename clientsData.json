@@ -480,5 +480,23 @@
       ]
     }
   ]
+},
+"cus_V9VAgUsX9R4Uba": {
+  "name": "Tony Dean - The Treat Shop (Richmond, VA)",
+  "phone": "+18048402517",
+  "email": "tonydean2u@gmail.com",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120249401421460513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 331.25,
+      "extendDays": 7,
+      "adsets": [
+        "120249401421470513"
+      ]
+    }
+  ]
 }
 }

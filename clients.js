@@ -40,17 +40,17 @@ module.exports = {
     "analytics": {
       "level": "campaign",
       "campaignIds": [
-        "120248816674280513"
+        "120208225851280513"
       ]
     },
     "campaigns": [
       {
         "type": "adset",
-        "increase": 331.25,
+        "increase": 165.62,
         "extendDays": 7,
         "adsets": [
-          "120248818019990513",
-          "120248816674290513"
+          "120215282436020513",
+          "120208225851570513"
         ]
       }
     ]

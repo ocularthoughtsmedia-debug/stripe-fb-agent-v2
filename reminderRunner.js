@@ -57,8 +57,22 @@ function markPaid({ invoiceId }) {
 }
 
 function scheduleFailedInvoice({ customerId, invoiceId, invoiceUrl, amountDue, phone, name }) {
-  if (!invoiceId) throw new Error("invoiceId is required");
+  if (!invoiceId) {
+    console.log("⚠️ Failed invoice reminder skipped: missing invoiceId");
+    return;
+  }
   if (!invoiceUrl) throw new Error("invoiceUrl is required");
+
+  // Stripe re-sends invoice.payment_failed on every retry of the same invoice.
+  // Only one live sequence per invoiceId — don't reset attempts/nextSendAt.
+  // Opted-out numbers are never re-scheduled.
+  const existing = readStore().find((r) => r.invoiceId === invoiceId);
+  if (existing && (existing.status === "unpaid" || existing.status === "opted_out")) {
+    console.log(
+      `⏭️ Reminder sequence already exists for invoice ${invoiceId}. Skipping duplicate Stripe retry.`
+    );
+    return existing;
+  }
 
   // ✅ This is what your current file is missing
   const nextSendAt = DateTime.now().plus({ minutes: 1 }).toISO(); // 1 minute for easy local testing
@@ -76,6 +90,8 @@ function scheduleFailedInvoice({ customerId, invoiceId, invoiceUrl, amountDue, p
     nextSendAt,
     createdAt: DateTime.now().toISO(),
   });
+
+  console.log(`📌 Scheduled failed invoice reminder for ${name || "Unknown client"} / invoice ${invoiceId}`);
 }
 
 async function sendReminder(reminder) {

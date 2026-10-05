@@ -64,10 +64,10 @@ function scheduleFailedInvoice({ customerId, invoiceId, invoiceUrl, amountDue, p
   if (!invoiceUrl) throw new Error("invoiceUrl is required");
 
   // Stripe re-sends invoice.payment_failed on every retry of the same invoice.
-  // Only one live sequence per invoiceId — don't reset attempts/nextSendAt.
-  // Opted-out numbers are never re-scheduled.
+  // One sequence per invoiceId, ever — any existing record (unpaid, stopped,
+  // opted_out, paid) means we never reset attempts/nextSendAt.
   const existing = readStore().find((r) => r.invoiceId === invoiceId);
-  if (existing && (existing.status === "unpaid" || existing.status === "opted_out")) {
+  if (existing) {
     console.log(
       `⏭️ Reminder sequence already exists for invoice ${invoiceId}. Skipping duplicate Stripe retry.`
     );

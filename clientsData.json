@@ -29,7 +29,7 @@
       "paymentsPerCycle": 4,
       "reportDelayDays": 2
     },
-    "analytics": { "level": "campaign", "campaignIds": ["120208225851280513"] },
+    "analytics": { "level": "campaign", "campaignIds": ["120248816674280513"] },
 "campaigns": [
   {
     "type": "adset",

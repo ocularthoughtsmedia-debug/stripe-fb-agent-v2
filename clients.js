@@ -327,7 +327,7 @@ module.exports = {
   },
   "cus_U7vN54rcivrX7n": {
     "name": "Gary Yancy - Yancy's Wingz & Thingz",
-    "phone": "",
+    "phone": "+15015410154",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",
@@ -337,20 +337,16 @@ module.exports = {
     "analytics": {
       "level": "campaign",
       "campaignIds": [
-        "120239462776610513"
+        "120249931469490513"
       ]
     },
     "campaigns": [
       {
         "type": "adset",
-        "increase": 66.25,
+        "increase": 500,
         "extendDays": 7,
         "adsets": [
-          "120239462776620513",
-          "120240975156240513",
-          "120240975200060513",
-          "120240975243290513",
-          "120240975298790513"
+          "120249975085880513"
         ]
       }
     ]

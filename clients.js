@@ -325,7 +325,7 @@ module.exports = {
       }
     ]
   },
-  "cus_U7vN54rcivrX7n": {
+  "cus_VPVaHVjywZtpRa": {
     "name": "Gary Yancy - Yancy's Wingz & Thingz",
     "phone": "+15015410154",
     "timezone": "America/New_York",

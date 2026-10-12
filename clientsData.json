@@ -493,5 +493,23 @@
       ]
     }
   ]
+},
+"cus_VQfmHiT4cEecyc": {
+  "name": "Don Que - Don Que's Southern BBQ (Brunswick, GA)",
+  "phone": "+17863609499",
+  "email": "",
+  "timezone": "America/New_York",
+  "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
+  "analytics": { "level": "campaign", "campaignIds": ["120249359818910513"] },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 331.25,
+      "extendDays": 7,
+      "adsets": [
+        "120249831493580513"
+      ]
+    }
+  ]
 }
 }

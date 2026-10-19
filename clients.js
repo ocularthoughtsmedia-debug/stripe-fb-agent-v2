@@ -735,5 +735,32 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_VScR32P9xuYzHQ": {
+    "name": "Anfrankina Little - Kina's Krazy Kreations (Eatonton, GA)",
+    "phone": "+14043531559",
+    "email": "littlebigrd11@gmail.com",
+    "timezone": "America/New_York",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120249586964300513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 331.25,
+        "extendDays": 7,
+        "adsets": [
+          "120249831433160513"
+        ]
+      }
+    ]
   }
 };

@@ -532,5 +532,30 @@
       ]
     }
   ]
+},
+"cus_VTDOkZ0hvy9J1X": {
+  "name": "Rolanda Crist - Lovelys Urban Fusion (Miami Gardens, FL)",
+  "phone": "+13053331413",
+  "email": "missrolanda@gmail.com",
+  "timezone": "America/New_York",
+  "billing": {
+    "cadence": "weekly",
+    "paymentsPerCycle": 4,
+    "reportDelayDays": 2
+  },
+  "analytics": {
+    "level": "campaign",
+    "campaignIds": ["120249588686720513"]
+  },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 331.25,
+      "extendDays": 7,
+      "adsets": [
+        "120249831316040513"
+      ]
+    }
+  ]
 }
 }

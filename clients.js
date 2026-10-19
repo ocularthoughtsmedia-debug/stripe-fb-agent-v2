@@ -354,7 +354,7 @@ module.exports = {
   },
   "cus_ULIPxPtdpO3j94": {
     "name": "Latoya Williams - Smoked Out Tasty Bites",
-    "phone": "+18435648755",
+    "phone": "",
     "timezone": "America/New_York",
     "billing": {
       "cadence": "weekly",

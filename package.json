@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node tests/allocation-guard.test.js"
+    "test": "node tests/allocation-guard.test.js",
+    "test:reports": "node tests/report-format.test.js && node tests/report-switches.test.js && node tests/report-cycles.test.js",
+    "reports:audit": "node scripts/report-config-audit.js",
+    "reports:verify-meta": "node scripts/meta-verify-insights.js",
+    "reports:test-send": "node scripts/send-test-report.js"
   },
   "keywords": [],
   "author": "",

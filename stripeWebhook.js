@@ -6,6 +6,10 @@ const clients = require("./clients"); // generated registry
 const { handleRegistryClientUpdate } = require("./facebookApi");
 const { scheduleFailedInvoice, markPaid } = require("./reminderRunner");
 const { getClientReportState, setClientReportState } = require("./reportsStore");
+const { recordPaymentFromWebhook } = require("./reportCycleStore");
+const { loadConfig: loadReportConfig } = require("./reportRunner");
+
+const reportConfig = loadReportConfig();
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -71,6 +75,13 @@ router.post("/", async (req, res) => {
       return res.status(200).json({ received: true });
     }
 
+    // ── 30-day report cycle (Postgres) ──
+    // Deliberately not awaited and never throws: it cannot delay, fail or
+    // change the response of the Facebook path below. Idempotent per invoice,
+    // so it runs before the fast-path return and a redelivery after a deploy
+    // can still record a payment the first delivery missed.
+    recordPaymentFromWebhook({ client, customerId, invoice, event, config: reportConfig });
+
     // ── Idempotency, fast path ──
     // lastInvoiceIdProcessed now means "the Facebook work for this invoice
     // COMPLETED", and is written only after that is true (see below).
@@ -96,6 +107,10 @@ router.post("/", async (req, res) => {
     // None of it spends money, so none of it needs to wait for Facebook.
     const billing = client.billing || { reportDelayDays: 2 };
 
+    // LEGACY: cycleStartAt / reportScheduledAt / lastPaymentAt below are no
+    // longer read by anything — report scheduling moved to report_cycles in
+    // Postgres (reportCycleStore.js). Left in place so this money-path block is
+    // unchanged; safe to delete in a later cleanup.
     // Start cycle clock on first successful payment
     if (!state.cycleStartAt) {
       state.cycleStartAt = Date.now();

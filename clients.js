@@ -790,5 +790,33 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_VTjGfy5l1zeBqb": {
+    "name": "Gigi Matlock - DALLAS IDA MAE's (Dallas, TX)",
+    "reportName": "DALLAS IDA MAE's",
+    "phone": "+12146838797",
+    "email": "Gigimatlock72@gmail.com",
+    "timezone": "America/Chicago",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120250110148720513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 331.25,
+        "extendDays": 7,
+        "adsets": [
+          "120250110148730513"
+        ]
+      }
+    ]
   }
 };

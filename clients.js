@@ -238,8 +238,8 @@ module.exports = {
       }
     ]
   },
-  "cus_TOAHOHfXHuTdKU": {
-    "name": "Rasheda Brown - The Q Spot",
+  "cus_VR6tIaZYQ2IdGr": {
+    "name": "Rasheda Brown - Kings Grille",
     "phone": "+18036361744",
     "timezone": "America/New_York",
     "billing": {
@@ -250,7 +250,7 @@ module.exports = {
     "analytics": {
       "level": "campaign",
       "campaignIds": [
-        "120248025671090513"
+        "120250064379960513"
       ]
     },
     "campaigns": [
@@ -259,7 +259,7 @@ module.exports = {
         "increase": 331.25,
         "extendDays": 7,
         "adsets": [
-          "120248025671070513"
+          "120250064379970513"
         ]
       }
     ]

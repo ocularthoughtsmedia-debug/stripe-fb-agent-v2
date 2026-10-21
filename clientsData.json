@@ -164,19 +164,19 @@
   ]
 },
 
-"cus_TOAHOHfXHuTdKU": {
-  "name": "Rasheda Brown - The Q Spot",
+"cus_VR6tIaZYQ2IdGr": {
+  "name": "Rasheda Brown - Kings Grille",
   "phone": "+18036361744",
   "timezone": "America/New_York",
   "billing": { "cadence": "weekly", "paymentsPerCycle": 4, "reportDelayDays": 2 },
-  "analytics": { "level": "campaign", "campaignIds": ["120248025671090513"] },
+  "analytics": { "level": "campaign", "campaignIds": ["120250064379960513"] },
   "campaigns": [
     {
       "type": "adset",
       "increase": 331.25,
       "extendDays": 7,
       "adsets": [
-        "120248025671070513"
+        "120250064379970513"
       ]
     }
   ]

@@ -818,5 +818,33 @@ module.exports = {
         ]
       }
     ]
+  },
+  "cus_VUL0Xpt2iGzKvf": {
+    "name": "Hamida Muhammad - Sota Soul (Saint Paul, MN)",
+    "reportName": "Sota Soul",
+    "phone": "+16518151787",
+    "email": "hamidamuhammad@gmail.com",
+    "timezone": "America/Chicago",
+    "billing": {
+      "cadence": "weekly",
+      "paymentsPerCycle": 4,
+      "reportDelayDays": 2
+    },
+    "analytics": {
+      "level": "campaign",
+      "campaignIds": [
+        "120249668684520513"
+      ]
+    },
+    "campaigns": [
+      {
+        "type": "adset",
+        "increase": 331.25,
+        "extendDays": 7,
+        "adsets": [
+          "120249831221630513"
+        ]
+      }
+    ]
   }
 };

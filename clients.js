@@ -604,6 +604,7 @@ module.exports = {
   },
   "cus_V0Vh7ZgBJa7ajo": {
     "name": "Netasha Reed - Flavaz Reserve (Fort Worth, TX)",
+    "reportName": "Flavaz Reserve",
     "phone": "+16825619847",
     "email": "admin@flavazreserve.com",
     "timezone": "America/Chicago",
@@ -625,6 +626,14 @@ module.exports = {
         "extendDays": 7,
         "adsets": [
           "120250079508410513"
+        ]
+      },
+      {
+        "type": "adset",
+        "increase": 90,
+        "extendDays": 7,
+        "adsets": [
+          "120250133799200513"
         ]
       }
     ]

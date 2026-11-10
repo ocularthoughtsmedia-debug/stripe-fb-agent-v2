@@ -622,5 +622,30 @@
       ]
     }
   ]
+}, "cus_VYQbU9dHWpE2Cf": {
+  "name": "Gregory Hill - THRILLS TURKEY LEGS (Arlington, TX)",
+  "reportName": "THRILLS TURKEY LEGS",
+  "phone": "+13187733159",
+  "email": "gregoryhill34@gmail.com",
+  "timezone": "America/Chicago",
+  "billing": {
+    "cadence": "weekly",
+    "paymentsPerCycle": 4,
+    "reportDelayDays": 2
+  },
+  "analytics": {
+    "level": "campaign",
+    "campaignIds": ["120248761308910513"]
+  },
+  "campaigns": [
+    {
+      "type": "adset",
+      "increase": 550.00,
+      "extendDays": 7,
+      "adsets": [
+        "120250266290310513"
+      ]
+    }
+  ]
 }
 }
